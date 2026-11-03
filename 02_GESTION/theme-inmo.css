@@ -1,0 +1,1138 @@
+/* ==========================================================================
+   5 TIERRAS — DISEÑO ALTERNATIVO: INMOCMS MODERN CLEAN SAAS
+   Inspirado en la interfaz InmoCMS (Blanco puro, gris suave, azul royal vibrante)
+   Activado condicionalmente cuando [data-theme="inmo"] o .theme-inmo está presente
+   ========================================================================== */
+
+/* ── 1. Variables Globales de Alto Contraste para Modo Inmo ── */
+[data-theme="inmo"],
+body.theme-inmo {
+  /* Sustituir variables oscuras por colores de alto contraste */
+  --text-white: #0f172a !important;       /* Cualquier texto que antes era blanco ahora es negro azulado */
+  --text-light: #1e293b !important;       /* Texto secundario oscuro */
+  --text-dim:   #475569 !important;       /* Etiquetas y descripciones en gris pizarra legible */
+  --text-muted: #64748b !important;       /* Textos tenues en gris medio de alto contraste */
+  --text-dark:  #0f172a !important;
+
+  --bg-dark:    #f5f7fb !important;
+  --bg-card:    #ffffff !important;
+  --bg-card-flat: #ffffff !important;
+  --bg-input:   #ffffff !important;
+  --bg-hover:   #f1f5f9 !important;
+
+  --glass-border:  #e2e8f0 !important;
+  --glass-border2: #cbd5e1 !important;
+  --glass-bg:      #ffffff !important;
+  --glass-shadow:  0 4px 20px rgba(0, 0, 0, 0.04) !important;
+
+  --primary:        #2563eb !important;
+  --primary-hover:  #1d4ed8 !important;
+  --primary-glow:   rgba(37, 99, 235, 0.25) !important;
+  --primary-soft:   rgba(37, 99, 235, 0.1) !important;
+
+  background: #f5f7fb !important;
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] body,
+body.theme-inmo {
+  background: #f5f7fb !important;
+  color: #0f172a !important;
+}
+
+/* ── 2. Regla General de Alto Contraste (Cero caracteres desvanecidos) ── */
+[data-theme="inmo"] p,
+[data-theme="inmo"] label,
+[data-theme="inmo"] td,
+[data-theme="inmo"] small,
+[data-theme="inmo"] .text-muted,
+[data-theme="inmo"] .text-dim {
+  color: #334155 !important;
+}
+
+[data-theme="inmo"] h1,
+[data-theme="inmo"] h2,
+[data-theme="inmo"] h3,
+[data-theme="inmo"] h4,
+[data-theme="inmo"] h5,
+[data-theme="inmo"] h6,
+[data-theme="inmo"] strong,
+[data-theme="inmo"] th,
+[data-theme="inmo"] b {
+  color: #0f172a !important;
+}
+
+/* Sobrescribir elementos con estilos en línea que tenían colores claros pensados para fondo oscuro */
+[data-theme="inmo"] [style*="color: #ffffff"],
+[data-theme="inmo"] [style*="color:#ffffff"],
+[data-theme="inmo"] [style*="color: #fff"],
+[data-theme="inmo"] [style*="color:#fff"],
+[data-theme="inmo"] [style*="color: white"],
+[data-theme="inmo"] [style*="color:white"] {
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] [style*="color: #94a3b8"],
+[data-theme="inmo"] [style*="color:#94a3b8"],
+[data-theme="inmo"] [style*="color: #a0c8d8"],
+[data-theme="inmo"] [style*="color:#a0c8d8"],
+[data-theme="inmo"] [style*="color: #d6ecf5"],
+[data-theme="inmo"] [style*="color:#d6ecf5"],
+[data-theme="inmo"] [style*="color: var(--text-dim)"],
+[data-theme="inmo"] [style*="color:var(--text-dim)"],
+[data-theme="inmo"] [style*="color: var(--text-muted)"],
+[data-theme="inmo"] [style*="color:var(--text-muted)"] {
+  color: #475569 !important;
+}
+
+[data-theme="inmo"] [style*="color: #38bdf8"],
+[data-theme="inmo"] [style*="color:#38bdf8"],
+[data-theme="inmo"] [style*="color: #00e5ff"],
+[data-theme="inmo"] [style*="color:#00e5ff"] {
+  color: #1d4ed8 !important; /* Azul royal legible en vez de cian deslumbrante */
+}
+
+/* ── 3. Layout y Contenedor Principal ── */
+[data-theme="inmo"] .app-layout,
+[data-theme="inmo"] .main-content,
+[data-theme="inmo"] .tab-container {
+  background: #f5f7fb !important;
+  color: #0f172a !important;
+}
+
+/* ── 4. Barra Lateral (Sidebar Estilo InmoCMS) ── */
+[data-theme="inmo"] .sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #e8edf3 !important;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="inmo"] .sidebar-brand {
+  border-bottom: 1px solid #f1f5f9 !important;
+  background: #ffffff !important;
+}
+
+[data-theme="inmo"] .brand-title {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="inmo"] .brand-sub {
+  color: #64748b !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="inmo"] .nav-section-title {
+  color: #64748b !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  margin: 18px 0 8px 12px !important;
+}
+
+[data-theme="inmo"] .nav-item {
+  color: #334155 !important;
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+  border-radius: 12px !important;
+  margin: 3px 8px !important;
+  padding: 10px 14px !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-theme="inmo"] .nav-item i {
+  color: #64748b !important;
+  font-size: 0.95rem !important;
+  transition: color 0.2s ease !important;
+}
+
+[data-theme="inmo"] .nav-item:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  transform: none !important;
+}
+
+[data-theme="inmo"] .nav-item:hover i {
+  color: #2563eb !important;
+}
+
+/* Pestaña Activa en Azul Royal Inmo */
+[data-theme="inmo"] .nav-item.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.32) !important;
+}
+
+[data-theme="inmo"] .nav-item.active i,
+[data-theme="inmo"] .nav-item.active span {
+  color: #ffffff !important;
+}
+
+[data-theme="inmo"] .nav-group-children {
+  background: #f8fafc !important;
+  border-radius: 10px !important;
+  margin: 4px 8px !important;
+  border: 1px solid #e8edf3 !important;
+}
+
+[data-theme="inmo"] .nav-badge {
+  border-radius: 9999px !important;
+  font-weight: 700 !important;
+  font-size: 0.72rem !important;
+  padding: 2px 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="inmo"] .sidebar-footer {
+  border-top: 1px solid #e8edf3 !important;
+  background: #ffffff !important;
+}
+
+/* ── 5. Cabecera Superior (Navbar) ── */
+[data-theme="inmo"] .app-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e8edf3 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+[data-theme="inmo"] #breadcrumb-parent {
+  color: #475569 !important;
+}
+
+[data-theme="inmo"] #breadcrumb-current {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] .header-breadcrumbs .separator {
+  color: #94a3b8 !important;
+}
+
+[data-theme="inmo"] .sync-status {
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+[data-theme="inmo"] .sync-status button {
+  color: #475569 !important;
+}
+
+[data-theme="inmo"] .notification-bell {
+  color: #475569 !important;
+}
+
+[data-theme="inmo"] .notification-bell:hover {
+  color: #2563eb !important;
+}
+
+[data-theme="inmo"] .user-profile .profile-name {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] .user-profile .profile-role {
+  color: #475569 !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] .user-profile .profile-avatar {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border: 2px solid #dbeafe !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* ── 6. Tarjetas y Bloques Generales ── */
+[data-theme="inmo"] .data-card,
+[data-theme="inmo"] .chart-card,
+[data-theme="inmo"] #panel-dashboard .data-card,
+[data-theme="inmo"] #panel-informes .data-card,
+[data-theme="inmo"] #panel-ctacte .data-card,
+[data-theme="inmo"] #panel-inventario .data-card,
+[data-theme="inmo"] #panel-ventas .data-card,
+[data-theme="inmo"] #panel-aprobaciones .data-card,
+[data-theme="inmo"] #panel-clientes .data-card,
+[data-theme="inmo"] #panel-liquidaciones .data-card,
+[data-theme="inmo"] #panel-documentos .data-card,
+[data-theme="inmo"] #panel-settings .data-card {
+  background: #ffffff !important;
+  border: 1px solid #e8edf3 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] .card-title,
+[data-theme="inmo"] .chart-title {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] .card-subtitle {
+  color: #475569 !important;
+}
+
+/* ── 7. KPIs Superiores Vivos (Estilo InmoCMS Image 2) ── */
+[data-theme="inmo"] .kpi-grid,
+[data-theme="inmo"] .informes-kpi-deck {
+  gap: 16px !important;
+}
+
+/* Tarjeta KPI 1: Azul Royal */
+[data-theme="inmo"] .kpi-grid .kpi-card:nth-child(1),
+[data-theme="inmo"] .informes-kpi-deck .kpi-deck-card:nth-child(1) {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25) !important;
+}
+
+/* Tarjeta KPI 2: Verde Esmeralda */
+[data-theme="inmo"] .kpi-grid .kpi-card:nth-child(2),
+[data-theme="inmo"] .informes-kpi-deck .kpi-deck-card:nth-child(2) {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25) !important;
+}
+
+/* Tarjeta KPI 3: Naranja Cálido */
+[data-theme="inmo"] .kpi-grid .kpi-card:nth-child(3),
+[data-theme="inmo"] .informes-kpi-deck .kpi-deck-card:nth-child(3) {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25) !important;
+}
+
+/* Tarjeta KPI 4: Fucsia / Rojo */
+[data-theme="inmo"] .kpi-grid .kpi-card:nth-child(4),
+[data-theme="inmo"] .informes-kpi-deck .kpi-deck-card:nth-child(4) {
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px rgba(225, 29, 72, 0.25) !important;
+}
+
+/* Dentro de las 4 Tarjetas KPI Vivas sí debe ser blanco */
+[data-theme="inmo"] .kpi-grid .kpi-card *,
+[data-theme="inmo"] .informes-kpi-deck .kpi-deck-card * {
+  color: #ffffff !important;
+}
+
+[data-theme="inmo"] .kpi-label,
+[data-theme="inmo"] .kpi-deck-label {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 700 !important;
+  font-size: 0.78rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+[data-theme="inmo"] .kpi-value,
+[data-theme="inmo"] .kpi-deck-val {
+  color: #ffffff !important;
+  font-size: 1.85rem !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="inmo"] .kpi-icon,
+[data-theme="inmo"] .kpi-deck-icon {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  border-radius: 12px !important;
+}
+
+/* ── 8. Tablas de Datos (Alto Contraste y Nitidez) ── */
+[data-theme="inmo"] .table-responsive,
+[data-theme="inmo"] .statement-table-wrapper {
+  background: #ffffff !important;
+  border: 1px solid #e8edf3 !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+[data-theme="inmo"] .premium-table,
+[data-theme="inmo"] .statement-table {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] .premium-table th,
+[data-theme="inmo"] .statement-table th {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-weight: 700 !important;
+  font-size: 0.76rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border-bottom: 1.5px solid #e2e8f0 !important;
+  padding: 12px 14px !important;
+}
+
+[data-theme="inmo"] .premium-table td,
+[data-theme="inmo"] .statement-table td {
+  color: #0f172a !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  font-size: 0.86rem !important;
+  padding: 12px 14px !important;
+}
+
+[data-theme="inmo"] .premium-table tr:hover,
+[data-theme="inmo"] .statement-table tr:hover {
+  background: #f8fafc !important;
+}
+
+/* ── 9. Filtros, Buscadores e Inputs ── */
+[data-theme="inmo"] .form-control,
+[data-theme="inmo"] input[type="text"],
+[data-theme="inmo"] input[type="search"],
+[data-theme="inmo"] select,
+[data-theme="inmo"] textarea {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-weight: 500 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="inmo"] .form-control:focus,
+[data-theme="inmo"] input:focus,
+[data-theme="inmo"] select:focus,
+[data-theme="inmo"] textarea:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+  outline: none !important;
+}
+
+[data-theme="inmo"] input::placeholder,
+[data-theme="inmo"] textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+[data-theme="inmo"] label,
+[data-theme="inmo"] .filter-group label {
+  color: #334155 !important;
+  font-weight: 700 !important;
+  font-size: 0.76rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* ── 10. Botones (InmoCMS Blue & Soft Gray) ── */
+[data-theme="inmo"] .btn-primary {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #1d4ed8 !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+}
+
+[data-theme="inmo"] .btn-primary:hover {
+  background: #1d4ed8 !important;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35) !important;
+}
+
+[data-theme="inmo"] .btn-secondary {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="inmo"] .btn-secondary:hover {
+  background: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+/* ── 11. Command Deck de Informes (Subtabs) ── */
+[data-theme="inmo"] #panel-informes .settings-subtab {
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+  border-radius: 14px !important;
+}
+
+[data-theme="inmo"] #panel-informes .settings-subtab:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  transform: translateY(-2px) !important;
+}
+
+[data-theme="inmo"] .subtab-title {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] .subtab-desc {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+[data-theme="inmo"] .subtab-icon-wrap {
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+/* Subtab Activa */
+[data-theme="inmo"] #panel-informes .settings-subtab.active {
+  background: #ffffff !important;
+  border: 2px solid #2563eb !important;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.16) !important;
+}
+
+[data-theme="inmo"] #panel-informes .settings-subtab.active .subtab-title {
+  color: #2563eb !important;
+}
+
+[data-theme="inmo"] #panel-informes .settings-subtab.active .subtab-desc {
+  color: #1d4ed8 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="inmo"] #panel-informes .settings-subtab.active .subtab-icon-wrap {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #2563eb !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* ── 12. Estado de Cuenta Corriente ── */
+[data-theme="inmo"] .statement-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] .statement-title {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="inmo"] .statement-date-badge {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+[data-theme="inmo"] .statement-header-grid {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="inmo"] .statement-meta-label {
+  color: #2563eb !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] .statement-meta-val {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] .statement-meta-sub {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="inmo"] .statement-section-title {
+  color: #0f172a !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="inmo"] .statement-summary {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] .statement-summary-row {
+  color: #334155 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="inmo"] .statement-summary-row strong {
+  color: #2563eb !important;
+}
+
+[data-theme="inmo"] .statement-summary-total {
+  color: #e11d48 !important;
+  border-top: 2px solid #e2e8f0 !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="inmo"] #informe-ctacte-placeholder {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="inmo"] #informe-ctacte-placeholder i {
+  color: #64748b !important;
+}
+
+[data-theme="inmo"] #informe-ctacte-placeholder h4 {
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] #informe-ctacte-placeholder p {
+  color: #475569 !important;
+}
+
+/* ── 13. Modales, Drawers y Overlays ── */
+[data-theme="inmo"] .modal-content,
+[data-theme="inmo"] .modal-card,
+[data-theme="inmo"] .action-modal-card {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.18) !important;
+  border-radius: 20px !important;
+}
+
+[data-theme="inmo"] .modal-header {
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+[data-theme="inmo"] .modal-title {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] .client-detail-drawer-box {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* ── 14. Mobile Chips Bar & Cartas Inventario Móvil ── */
+[data-theme="inmo"] .mobile-chips-bar {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="inmo"] .mobile-chip {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1px solid #e2e8f0 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="inmo"] .mobile-chip.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+
+[data-theme="inmo"] .inventario-card-mobile {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] .inventario-card-mobile * {
+  color: #0f172a;
+}
+
+[data-theme="inmo"] .inventario-card-mobile .badge,
+[data-theme="inmo"] .inventario-card-mobile .badge * {
+  color: #ffffff !important;
+}
+
+/* ── 15. Botón Selector de Diseño (Switch Toggle) ── */
+.theme-switch-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 6px 14px !important;
+  border-radius: 9999px !important;
+  font-weight: 700 !important;
+  font-size: 0.82rem !important;
+  cursor: pointer !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none !important;
+  outline: none !important;
+}
+
+/* En Modo Clásico (Dark) */
+.theme-switch-btn {
+  background: rgba(0, 229, 255, 0.12) !important;
+  color: #00e5ff !important;
+  border: 1px solid rgba(0, 229, 255, 0.4) !important;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.25) !important;
+}
+
+.theme-switch-btn:hover {
+  background: rgba(0, 229, 255, 0.22) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.45) !important;
+}
+
+/* En Modo Inmo (Clean Light) */
+[data-theme="inmo"] .theme-switch-btn,
+body.theme-inmo .theme-switch-btn {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #1d4ed8 !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28) !important;
+}
+
+[data-theme="inmo"] .theme-switch-btn:hover,
+body.theme-inmo .theme-switch-btn:hover {
+  background: #1d4ed8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4) !important;
+}
+
+@media (max-width: 600px) {
+  .theme-switch-btn span {
+    display: none !important;
+  }
+  .theme-switch-btn {
+    padding: 6px 10px !important;
+  }
+}
+
+
+/* ==========================================================================
+   16. REDISEÑO TOTAL SIDEBAR INMOCMS (ELIMINACIÓN DE BLOQUES OSCUROS Y NEÓN)
+   Inspirado en el menú limpio lateral de InmoCMS sobre fondo blanco puro
+   ========================================================================== */
+[data-theme="inmo"] .sidebar,
+body.theme-inmo .sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="inmo"] .sidebar-nav {
+  background: #ffffff !important;
+}
+
+/* Desmontar bloques oscuros de neón del perfil Administrador y Gerencia */
+[data-theme="inmo"] .sidebar-block,
+[data-theme="inmo"] .sidebar-block-emerald,
+[data-theme="inmo"] .sidebar-block-cyan,
+[data-theme="inmo"] .sidebar-block-purple,
+[data-theme="inmo"] .sidebar-block-amber,
+body.theme-inmo .sidebar-block {
+  background: transparent !important;
+  border: none !important;
+  border-left: none !important;
+  box-shadow: none !important;
+  margin: 6px 8px 14px 8px !important;
+  padding: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+[data-theme="inmo"] .sidebar-block:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Encabezados de sección estilo InmoCMS (subtítulo sutil, elegante y limpio) */
+[data-theme="inmo"] .sidebar-block-header,
+body.theme-inmo .sidebar-block-header {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: none !important;
+  padding: 12px 12px 6px 12px !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: #64748b !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+[data-theme="inmo"] .sidebar-block-header i,
+body.theme-inmo .sidebar-block-header i {
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+}
+
+[data-theme="inmo"] .sidebar-block-emerald .sidebar-block-header,
+[data-theme="inmo"] .sidebar-block-emerald .sidebar-block-header i {
+  color: #059669 !important;
+}
+
+[data-theme="inmo"] .sidebar-block-cyan .sidebar-block-header,
+[data-theme="inmo"] .sidebar-block-cyan .sidebar-block-header i {
+  color: #0284c7 !important;
+}
+
+[data-theme="inmo"] .sidebar-block-purple .sidebar-block-header,
+[data-theme="inmo"] .sidebar-block-purple .sidebar-block-header i {
+  color: #7c3aed !important;
+}
+
+[data-theme="inmo"] .sidebar-block-amber .sidebar-block-header,
+[data-theme="inmo"] .sidebar-block-amber .sidebar-block-header i {
+  color: #d97706 !important;
+}
+
+/* Contenido de bloque */
+[data-theme="inmo"] .sidebar-block-content,
+body.theme-inmo .sidebar-block-content {
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+/* Ítems del menú inactivos en todos los bloques (Alto contraste, legibilidad máxima) */
+[data-theme="inmo"] .sidebar .nav-item,
+[data-theme="inmo"] .sidebar-block .nav-item,
+[data-theme="inmo"] .sidebar-block-content .nav-item,
+body.theme-inmo .sidebar .nav-item,
+body.theme-inmo .sidebar-block .nav-item,
+body.theme-inmo .sidebar-block-content .nav-item {
+  color: #334155 !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  margin: 1px 4px !important;
+  padding: 9px 12px !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  transition: all 0.16s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+[data-theme="inmo"] .sidebar .nav-item span,
+[data-theme="inmo"] .sidebar-block .nav-item span,
+[data-theme="inmo"] .sidebar-block-content .nav-item span,
+body.theme-inmo .sidebar .nav-item span,
+body.theme-inmo .sidebar-block .nav-item span,
+body.theme-inmo .sidebar-block-content .nav-item span {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="inmo"] .sidebar .nav-item i,
+[data-theme="inmo"] .sidebar-block .nav-item i,
+[data-theme="inmo"] .sidebar-block-content .nav-item i,
+body.theme-inmo .sidebar .nav-item i,
+body.theme-inmo .sidebar-block .nav-item i,
+body.theme-inmo .sidebar-block-content .nav-item i {
+  color: #64748b !important;
+  font-size: 0.95rem !important;
+  transition: color 0.16s ease !important;
+}
+
+/* Hover de ítems */
+[data-theme="inmo"] .sidebar .nav-item:hover,
+[data-theme="inmo"] .sidebar-block .nav-item:hover,
+[data-theme="inmo"] .sidebar-block-content .nav-item:hover,
+body.theme-inmo .sidebar .nav-item:hover,
+body.theme-inmo .sidebar-block .nav-item:hover,
+body.theme-inmo .sidebar-block-content .nav-item:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  transform: none !important;
+}
+
+[data-theme="inmo"] .sidebar .nav-item:hover span,
+[data-theme="inmo"] .sidebar-block .nav-item:hover span,
+[data-theme="inmo"] .sidebar-block-content .nav-item:hover span,
+body.theme-inmo .sidebar .nav-item:hover span,
+body.theme-inmo .sidebar-block .nav-item:hover span,
+body.theme-inmo .sidebar-block-content .nav-item:hover span {
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] .sidebar .nav-item:hover i,
+[data-theme="inmo"] .sidebar-block .nav-item:hover i,
+[data-theme="inmo"] .sidebar-block-content .nav-item:hover i,
+body.theme-inmo .sidebar .nav-item:hover i,
+body.theme-inmo .sidebar-block .nav-item:hover i,
+body.theme-inmo .sidebar-block-content .nav-item:hover i {
+  color: #2563eb !important;
+}
+
+/* Ítem Activo (Azul Royal InmoCMS con fondo vibrante y texto blanco puro) */
+[data-theme="inmo"] .sidebar .nav-item.active,
+[data-theme="inmo"] .sidebar-block .nav-item.active,
+[data-theme="inmo"] .sidebar-block-content .nav-item.active,
+body.theme-inmo .sidebar .nav-item.active,
+body.theme-inmo .sidebar-block .nav-item.active,
+body.theme-inmo .sidebar-block-content .nav-item.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3) !important;
+}
+
+[data-theme="inmo"] .sidebar .nav-item.active span,
+[data-theme="inmo"] .sidebar-block .nav-item.active span,
+[data-theme="inmo"] .sidebar-block-content .nav-item.active span,
+[data-theme="inmo"] .sidebar .nav-item.active i,
+[data-theme="inmo"] .sidebar-block .nav-item.active i,
+[data-theme="inmo"] .sidebar-block-content .nav-item.active i,
+body.theme-inmo .sidebar .nav-item.active span,
+body.theme-inmo .sidebar-block .nav-item.active span,
+body.theme-inmo .sidebar-block-content .nav-item.active span,
+body.theme-inmo .sidebar .nav-item.active i,
+body.theme-inmo .sidebar-block .nav-item.active i,
+body.theme-inmo .sidebar-block-content .nav-item.active i {
+  color: #ffffff !important;
+}
+
+/* Badges de notificación en el Sidebar */
+[data-theme="inmo"] .sidebar .nav-badge,
+[data-theme="inmo"] .sidebar .badge,
+body.theme-inmo .sidebar .nav-badge,
+body.theme-inmo .sidebar .badge {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  border-radius: 9999px !important;
+  padding: 2px 7px !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35) !important;
+}
+
+[data-theme="inmo"] .sidebar .nav-item.active .nav-badge,
+body.theme-inmo .sidebar .nav-item.active .nav-badge {
+  background: #ffffff !important;
+  color: #2563eb !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ==========================================================================
+   17. FICHA DE LOTE Y BOTTOM SHEET (ESTILO INMOCMS MODERNO Y LIMPIO)
+   Diseño de tarjeta blanca pura, bordes suaves, tipografía nítida y botones vibrantes
+   ========================================================================== */
+[data-theme="inmo"] .bottom-sheet,
+body.theme-inmo .bottom-sheet {
+  background: #ffffff !important;
+  border-top: 2px solid #2563eb !important;
+  box-shadow: 0 -12px 40px rgba(15, 23, 42, 0.16) !important;
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] .bottom-sheet-handle {
+  background: #ffffff !important;
+}
+
+[data-theme="inmo"] .handle-bar {
+  background: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+[data-theme="inmo"] .bottom-sheet-close {
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="inmo"] .bottom-sheet-close:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] .bottom-sheet-content,
+[data-theme="inmo"] .lote-panel {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Lote Header & Specs */
+[data-theme="inmo"] .lote-header h3,
+[data-theme="inmo"] .lote-header h2,
+[data-theme="inmo"] #lote-title,
+[data-theme="inmo"] .bottom-sheet h3 {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="inmo"] .lote-header span,
+[data-theme="inmo"] #lote-project,
+[data-theme="inmo"] .bottom-sheet .lote-header span {
+  color: #64748b !important;
+}
+
+[data-theme="inmo"] .spec-label {
+  color: #64748b !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.5px !important;
+}
+
+[data-theme="inmo"] .spec-value,
+[data-theme="inmo"] #lote-area,
+[data-theme="inmo"] #lote-price,
+[data-theme="inmo"] .bottom-sheet .spec-value {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+/* Modificación de Precio Oficial de Lista (Caja Gerencial) */
+[data-theme="inmo"] #gerente-ficha-info > div:first-child,
+[data-theme="inmo"] #lote-action-form > div:first-child,
+[data-theme="inmo"] #bs-lote-action-form > div:first-child {
+  background: #f8fafc !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="inmo"] #gerente-ficha-info label,
+[data-theme="inmo"] #bs-lote-action-form label {
+  color: #334155 !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] #gerente-precio-lista-input,
+[data-theme="inmo"] #bs-lote-action-form input {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+}
+
+[data-theme="inmo"] #btn-gerente-guardar-precio-info,
+[data-theme="inmo"] #btn-guardar-precio-lista-direct {
+  background: #2563eb !important;
+  border: 1px solid #1d4ed8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] #btn-nueva-venta-directa {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3) !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="inmo"] #btn-nueva-venta-directa:hover {
+  background: #1d4ed8 !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4) !important;
+}
+
+[data-theme="inmo"] #btn-gerente-bloquear-info,
+[data-theme="inmo"] #btn-gerente-bloquear {
+  background: #f1f5f9 !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #475569 !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="inmo"] #btn-gerente-bloquear-info:hover,
+[data-theme="inmo"] #btn-gerente-bloquear:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Fichas Comerciales de Negociación (Estados Reservada, Promesada, Vendida) */
+[data-theme="inmo"] .lote-ficha,
+[data-theme="inmo"] .negociacion-tracking-container,
+[data-theme="inmo"] .commercial-tracking-card,
+[data-theme="inmo"] .tracking-phase-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+  border-radius: 12px !important;
+}
+
+[data-theme="inmo"] .empty-state {
+  color: #64748b !important;
+}
+[data-theme="inmo"] .empty-state i {
+  color: #2563eb !important;
+}
+[data-theme="inmo"] .empty-state h3 {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+[data-theme="inmo"] .empty-state p {
+  color: #64748b !important;
+}
+
+/* ==========================================================================
+   18. TÍTULOS DE GRÁFICOS Y TARJETAS SIN ESPACIO EN STYLE
+   Garantiza que etiquetas y números dentro de tarjetas se lean perfectamente
+   ========================================================================== */
+[data-theme="inmo"] .chart-card h3,
+[data-theme="inmo"] .chart-card h4,
+[data-theme="inmo"] .data-card h2,
+[data-theme="inmo"] .data-card h3,
+[data-theme="inmo"] .data-card h4,
+[data-theme="inmo"] .card-title,
+[data-theme="inmo"] .chart-title,
+[data-theme="inmo"] #embudo-metricas-sub,
+[data-theme="inmo"] #embudo-tasa-efectividad,
+[data-theme="inmo"] [style*="color:#ffffff"],
+[data-theme="inmo"] [style*="color: #ffffff"],
+[data-theme="inmo"] [style*="color:#fff"],
+[data-theme="inmo"] [style*="color: #fff"],
+[data-theme="inmo"] [style*="color:white"],
+[data-theme="inmo"] [style*="color: white"] {
+  color: #0f172a !important;
+}
+
+/* Badge de tasa de efectividad (ej: "97% Conversión a Promesa") */
+[data-theme="inmo"] #embudo-tasa-efectividad {
+  background: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+  color: #047857 !important;
+  font-weight: 700 !important;
+}
+
+/* Selectores de Años y Botones de Gráficos (Lotes / Monto $) */
+[data-theme="inmo"] .chart-card select,
+[data-theme="inmo"] .data-card select {
+  background-color: #f1f5f9 !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="inmo"] .btn-toggle-group,
+[data-theme="inmo"] .chart-actions {
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+}
+
+[data-theme="inmo"] .btn-toggle-group .btn-toggle,
+[data-theme="inmo"] .chart-actions button {
+  color: #475569 !important;
+}
+
+[data-theme="inmo"] .btn-toggle-group .btn-toggle.active,
+[data-theme="inmo"] .chart-actions button.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}

@@ -1,0 +1,1551 @@
+﻿<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <!--  —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   — 
+       5 TIERRAS  —   CRM & GIS Unificado
+       SPA Shell · v1.0.0
+        —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('app5t_design_theme');
+        if (saved === 'inmo') {
+          document.documentElement.setAttribute('data-theme', 'inmo');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
+  <meta name="theme-color" content="#0a0e1a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="5 TIERRAS">
+  <meta name="description" content="5 Tierras  —   CRM & GIS Unificado para gestión inmobiliaria de parcelas">
+  <meta http-equiv="Expires" content="0">
+
+  <title>5 TIERRAS  —   CRM &amp; GIS Unificado</title>
+
+  <!-- PWA & Mobile Web App Shortcut Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="shortcut icon" href="favicon.png">
+
+  <!-- Google Fonts: Inter + Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6.5.1 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- Leaflet 1.9.4 CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin="">
+
+  <!-- MapLibre GL 3.6.2 CSS (Motor 3D PC) -->
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+
+
+  <!-- App Design System -->
+  <link rel="stylesheet" href="index.css?v=theme_1790290881836">
+  <!-- Diseño Alternativo InmoCMS Modern Clean SaaS -->
+  <link rel="stylesheet" href="theme-inmo.css?v=1.0.0">
+  <!-- Tailwind CSS CDN for Login and Settings Panel -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    window.tailwind.config = {
+      corePlugins: {
+        preflight: false,
+      }
+    }
+  </script>
+  <!-- Inline Safeguard to trigger database auto-healing if properties are empty or lack coordinates -->
+  <script>
+    try {
+      var props = localStorage.getItem('app5t_propiedades');
+      if (!props || JSON.parse(props).length === 0 || !JSON.parse(props).some(function(p) { return p.coordenadas; })) {
+        localStorage.removeItem('app5t_db_version');
+      }
+    } catch(e) {}
+  </script>
+</head>
+
+<body>
+  <!-- ================================================================
+       LOGIN CONTAINER (Zero-Trust Security overlay)
+       ================================================================ -->
+  <div id="login-container" class="absolute top-0 left-0 w-full min-h-[100dvh] z-[99999] flex flex-col items-center justify-start pt-8 md:justify-center md:pt-0 bg-[#0a0e1a]/95 backdrop-blur-md transition-opacity duration-300">
+    <div class="w-full max-w-md p-6 md:p-8 mb-16 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl flex flex-col items-center mt-4 md:mt-0">
+      
+      <!-- Brand Logo & Header -->
+      <div class="flex items-center gap-3 mb-8">
+        <img src="../04_RECURSOS/logo5t.png?v=20260924_1541,93975" alt="5T Logo" class="w-12 h-12 object-contain">
+        <div>
+          <h2 class="text-2xl font-extrabold tracking-wide text-white leading-tight font-['Outfit'] m-0">5 TIERRAS</h2>
+          <p class="text-[10px] text-purple-400 font-semibold uppercase tracking-widest leading-none m-0">Consola de Gestión</p>
+        </div>
+      </div>
+      
+      <!-- Form -->
+      <form id="login-form" onsubmit="if(window.APP5T_handleLogin) window.APP5T_handleLogin(event); event.preventDefault(); return false;" class="w-full flex flex-col gap-5 m-0">
+        <div class="flex flex-col gap-2">
+          <label for="login-rut" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">RUT Usuario</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+              <i class="fa-solid fa-address-card"></i>
+            </span>
+            <input type="text" id="login-rut" placeholder="12.345.678-9" required
+                   autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text"
+                   class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all font-medium text-sm">
+          </div>
+        </div>
+        
+        <div class="flex flex-col gap-2">
+          <label for="login-password" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Contraseña</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+              <i class="fa-solid fa-lock"></i>
+            </span>
+            <input type="password" id="login-password" placeholder="••••••••" required
+                   autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false"
+                   class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all text-sm">
+          </div>
+        </div>
+        
+        <!-- In-card feedback alert for clear visibility on mobile/iOS -->
+        <div id="login-feedback-msg" class="hidden w-full p-3 rounded-xl text-xs font-semibold border text-center transition-all duration-200"></div>
+
+        <button type="submit" id="btn-login-submit" onclick="if(window.APP5T_handleLogin) window.APP5T_handleLogin(event);"
+                class="w-full py-3 mt-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-purple-600/20 hover:from-purple-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all flex items-center justify-center gap-2 cursor-pointer border-0 outline-none text-sm">
+          <i class="fa-solid fa-right-to-bracket"></i> Ingresar
+        </button>
+      </form>
+      
+      <!-- Footer Info -->
+      <p class="text-center text-[10px] text-slate-600 mt-8 mb-0">
+        Sistema de Seguridad Zero-Trust &middot; 5 Tierras &copy; 2026
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Safari iOS Anti-Bounce Fix for Login
+    document.querySelectorAll('#login-form input').forEach(input => {
+      input.addEventListener('focus', () => {
+        if (window.innerWidth < 768) {
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.body.scrollTop = 0;
+          }, 300);
+        }
+      });
+    });
+  </script>
+
+  <!-- ================================================================
+       APP LAYOUT CONTAINER
+       ================================================================ -->
+  <div class="app-layout" id="app-layout" >
+
+    <!--  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  — 
+         MOBILE: Hamburger Button
+          —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  -->
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir menú">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!--  — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — 
+         SIDEBAR
+          — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " —  -->
+    <aside class="sidebar" id="sidebar">
+
+      <!-- Brand -->
+      <div class="sidebar-brand">
+        <img src="../04_RECURSOS/logo5t.png?v=20260924_1541,93975" alt="5T" class="brand-logo">
+        <div>
+          <h1 class="brand-title">5 TIERRAS</h1>
+          <p class="brand-subtitle">Gestión operativa</p>
+        </div>
+      </div>
+
+      <!-- Navigation (populated by JS based on role) -->
+      <nav class="sidebar-nav" id="sidebar-nav">
+        <!-- Menu items injected by JS -->
+      </nav>
+
+      <!-- Footer: Copyright -->
+      <div class="sidebar-footer" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <button id="theme-toggle" style="display:none !important;">
+          <i class="fa-solid fa-moon"></i> Modo Oscuro
+        </button>
+        <p class="footer-text">5 Tierras &copy; 2026</p>
+      </div>
+    </aside>
+
+    <!-- """"""""""""""""""""""""""""""""""""""""""""""""""""""
+         MAIN CONTENT AREA
+         """""""""""""""""""""""""""""""""""""""""""""""""""""" -->
+    <main class="main-content">
+
+      <!--    App Header    -->
+      <header class="app-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button id="btn-header-back-map" type="button" onclick="if(window.APP5T && window.APP5T.goBackToMap) window.APP5T.goBackToMap();" 
+                  title="Volver al Mapa" 
+                  style="display:none; align-items:center; justify-content:center; width:34px; height:34px; min-width:34px; background:rgba(0, 229, 255, 0.1); border:1px solid rgba(0, 229, 255, 0.3); color:var(--primary, #00e5ff); border-radius:8px; font-size:1rem; cursor:pointer; transition:all 0.2s;"
+                  onmouseover="this.style.background='rgba(0, 229, 255, 0.2)'; this.style.borderColor='var(--primary)';"
+                  onmouseout="this.style.background='rgba(0, 229, 255, 0.1)'; this.style.borderColor='rgba(0, 229, 255, 0.3)';">
+            <i class="fa-solid fa-map-location-dot"></i>
+          </button>
+          <div class="header-breadcrumbs">
+            <span id="breadcrumb-parent">Consola</span>
+            <span class="separator">/</span>
+            <span id="breadcrumb-current" class="active">Dashboard</span>
+          </div>
+        </div>
+
+        <!-- Role Selector Buttons (Hidden for Production Auth) -->
+        <div class="role-btn-group" id="role-btn-group" style="display: none;">
+          <button class="role-btn" data-role="vendedor"><i class="fa-solid fa-user-tag"></i> <span>Ventas</span></button>
+          <button class="role-btn" data-role="gerente"><i class="fa-solid fa-user-tie"></i> <span>Gerencia</span></button>
+          <button class="role-btn" data-role="administrador"><i class="fa-solid fa-scale-balanced"></i> <span>Administración</span></button>
+        </div>
+
+        <div class="header-right" style="display:flex; align-items:center; gap: 16px;">
+          <div class="header-actions" style="display:flex; align-items:center; gap: 16px;">
+            <div class="sync-status" id="sync-status" title="En línea (Clic para sincronizar)" style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 2px 4px; border-radius: 6px;">
+              <span class="sync-dot online" id="sync-dot"></span>
+              <span class="sync-text" id="sync-text" style="display: none;">Conectado</span>
+              <button id="btn-force-sync" title="Forzar Sincronización" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 2px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: color 0.2s; outline: none;" onmouseover="this.style.color='var(--text-light)'" onmouseout="this.style.color='var(--text-muted)'">
+                <i class="fa-solid fa-arrows-rotate"></i>
+              </button>
+            </div>
+            <!-- Funnel Button (Only visible on map mobile) -->
+            <button id="map-filter-toggle" class="map-filter-toggle-btn" onclick="document.getElementById('map-controls-panel').classList.toggle('expanded')" title="Filtros del Mapa" style="background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;">
+              <i class="fa-solid fa-filter"></i>
+            </button>
+
+            <!-- Selector de Diseño Alternativo: Clásico vs InmoCMS -->
+            <button id="btn-theme-switch" class="theme-switch-btn" type="button" title="Alternar entre Diseño Clásico y Diseño Moderno Inmo">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span id="theme-switch-label">Diseño Inmo</span>
+            </button>
+
+            <!-- Notification Bell -->
+            <div class="notification-bell" id="btn-notifications" title="Mis Solicitudes Pendientes" style="position:relative; cursor:pointer; color:var(--text-muted); font-size: 1.25rem; transition:color 0.2s;" onmouseover="this.style.color='var(--text-light)';" onmouseout="this.style.color='var(--text-muted)';">
+              <i class="fa-regular fa-bell"></i>
+              <span id="notification-badge" class="badge" style="display:none; position:absolute; top:-6px; right:-8px; background:var(--accent-red); color:white; font-size:0.65rem; padding: 2px 5px; border-radius:10px; font-weight:bold; border: 2px solid var(--bg-dark);">0</span>
+            </div>
+          </div>
+
+          <div class="user-profile" style="display:flex; align-items:center; gap:12px;">
+            <div class="profile-info">
+              <span id="user-name" class="profile-name">Usuario</span>
+              <span id="user-role" class="profile-role">Vendedor</span>
+            </div>
+            <div class="profile-avatar" id="btn-logout" aria-label="Cerrar Sesión" title="Cerrar Sesión" style="cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.color='#ef4444';" onmouseout="this.style.background=''; this.style.color='';">
+              <i class="fa-solid fa-user"></i>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Mobile Category Chips (horizontal scroll) -->
+      <div class="mobile-chips-bar" id="mobile-chips-bar"></div>
+
+      <!--  — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — 
+           TAB CONTAINER  —   All Panels
+            — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " —  -->
+      <div class="tab-container" id="tab-container">
+
+        <!--  —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   — 
+             TAB: Dashboard
+              —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —  -->
+        <div class="tab-panel" id="panel-dashboard">
+
+          <!-- Título Dashboard Gerencia -->
+          <div class="dashboard-gerencia-header role-chart role-gerente role-administrador" style="display:none; margin-bottom: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <h2 style="font-size: 24px; font-weight: 700; color:#ffffff; margin: 0;">RESUMEN COMERCIAL</h2>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <select id="dashboard-filter-proyecto" class="form-control" style="width: 250px; height: 38px;">
+                  <option value="all">-- Todos los Proyectos --</option>
+                </select>
+                <button onclick="APP5T_Charts.exportDashboardExcel()" style="background-color: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; display:flex; align-items:center; gap:8px; box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2); transition: background 0.2s;" onmouseover="this.style.backgroundColor='#219653';" onmouseout="this.style.backgroundColor='#27ae60';" title="Descargar en Excel">
+                  <i class="fa-solid fa-file-excel"></i> Excel
+                </button>
+                <button onclick="APP5T_Charts.exportChartReport('panel-dashboard', 'Resumen_Comercial_Completo')" style="background-color: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; display:flex; align-items:center; gap:8px; box-shadow: 0 4px 6px rgba(231, 76, 60, 0.2); transition: background 0.2s;" onmouseover="this.style.backgroundColor='#c0392b';" onmouseout="this.style.backgroundColor='#e74c3c';" title="Descargar Informe Completo PDF">
+                  <i class="fa-solid fa-file-pdf"></i> PDF
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI Cards (populated by JS) -->
+          <div class="kpi-grid" id="kpi-grid">
+            <!-- .kpi-card elements injected dynamically -->
+          </div>
+
+          <!-- ==========================================
+               NUEVO LAYOUT GERENCIA (CSS Grid)
+               ========================================== -->
+          <div class="dashboard-gerencia-layout role-chart role-gerente" style="display:none;">
+            
+            <!-- Fila 2: Embudo (Izquierda) + Paneles (Derecha) -->
+            <div class="gerencia-grid-row-2">
+              <!-- Embudo de Ventas Mejorado -->
+              <div class="chart-card gerencia-embudo">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                  <h3 class="chart-title" style="margin-bottom:0; text-transform:uppercase; font-size:12px; color:#ffffff; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-filter" style="color: #818cf8;"></i> Embudo de Conversión Comercial
+                  </h3>
+                  <span id="embudo-tasa-efectividad" style="font-size:11px; font-weight:700; color:#34d399; background:rgba(52,211,153,0.15); border:1px solid rgba(52,211,153,0.3); padding:2px 8px; border-radius:12px;">--% Efectividad</span>
+                </div>
+                <div id="embudo-metricas-sub" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:11px; color:#94a3b8; background:rgba(255,255,255,0.03); padding:4px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:4px;">
+                  <span>Reserva ➔ Promesa: <strong id="embudo-conv-promesa" style="color:#60a5fa;">--%</strong></span>
+                  <span>Promesa ➔ Escritura: <strong id="embudo-conv-escritura" style="color:#34d399;">--%</strong></span>
+                  <span id="embudo-lead-time" style="color:#f59e0b;">⏱️ --</span>
+                </div>
+                <div class="chart-wrapper">
+                  <canvas id="chart-embudo-ventas"></canvas>
+                </div>
+              </div>
+
+              <!-- Evolución Comercial Anual (Promesas vs Escrituras) con Toggle -->
+              <div class="chart-card gerencia-evolucion">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                  <h3 class="chart-title" style="margin-bottom:0; text-transform:uppercase; font-size:12px; color:#ffffff; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-chart-line" style="color: #60a5fa;"></i> Evolución Comercial Anual
+                  </h3>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <!-- Toggle Unidades / Monto -->
+                    <div style="display:inline-flex; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.15); border-radius:6px; padding:2px;">
+                      <button type="button" id="btn-evolucion-unidades" class="active" style="border:none; background:#2563eb; color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; cursor:pointer;">Lotes</button>
+                      <button type="button" id="btn-evolucion-monto" style="border:none; background:transparent; color:#94a3b8; font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; cursor:pointer;">Monto $</button>
+                    </div>
+                    <select id="filter-year-evolucion" class="year-filter-select" style="font-size: 0.78rem; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: #1e293b; color: #fff; cursor: pointer; outline: none;"></select>
+                  </div>
+                </div>
+                <!-- Mini badges de resumen anual -->
+                <div id="evolucion-mini-kpis" style="display:flex; gap:8px; margin-bottom:8px; font-size:11px; color:#94a3b8; background:rgba(255,255,255,0.03); padding:4px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); flex-wrap:wrap;">
+                  <span><strong id="kpi-prom-total" style="color:#60a5fa;">0</strong> Promesas</span>
+                  <span style="color:rgba(255,255,255,0.2);">|</span>
+                  <span><strong id="kpi-esc-total" style="color:#34d399;">0</strong> Escrituras</span>
+                  <span style="color:rgba(255,255,255,0.2);">|</span>
+                  <span>Comprometido: <strong id="kpi-monto-total" style="color:#f59e0b;">$ 0</strong></span>
+                </div>
+                <div class="chart-wrapper">
+                  <canvas id="chart-evolucion-ventas"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fila 3: Gráficos Financieros -->
+            <div class="charts-row gerencia-grid-row-3 role-chart role-gerente" style="display:none; margin-bottom:20px; margin-top:20px;">
+              
+              <!-- Cobranza del Mes -->
+              <div class="chart-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                  <h3 class="chart-title" style="margin-bottom:0; text-transform:uppercase; font-size:12px; color:#ffffff;">Cobranza del Mes</h3>
+                  <select id="filter-year-cobranza" class="year-filter-select" style="font-size: 0.8rem; padding: 2px 5px; border-radius: 4px; border: 1px solid #ddd; background: #fff; cursor: pointer;  outline: none;"></select>
+                </div>
+                <div class="chart-wrapper">
+                  <canvas id="chart-cobranza-mes-gerencia"></canvas>
+                </div>
+              </div>
+
+              <!-- Proyección Flujo de Caja -->
+              <div class="chart-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                  <h3 class="chart-title" style="margin-bottom:0; text-transform:uppercase; font-size:12px; color:#ffffff;">Proyección Flujo de Caja</h3>
+                  <select id="filter-year-cashflow" class="year-filter-select" style="font-size: 0.8rem; padding: 2px 5px; border-radius: 4px; border: 1px solid #ddd; background: #fff; cursor: pointer;  outline: none;"></select>
+                </div>
+                <div class="chart-wrapper">
+                  <canvas id="chart-cashflow-gerencia"></canvas>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Fila 4: Gráficos Secundarios y Discretos -->
+            <div class="charts-row gerencia-grid-row-4 compact-row role-chart role-gerente" style="display:none; margin-bottom:20px;">
+              
+              <!-- Nivel de Morosidad -->
+              <div class="chart-card" style="padding: 16px;">
+                <h3 class="chart-title" style="margin-bottom: 6px; text-transform: uppercase; font-size: 11px; color:#ffffff; font-weight: 700; letter-spacing: 0.5px;">Nivel de Morosidad</h3>
+                <div class="chart-wrapper" style="height: 135px; position: relative; display: flex; align-items: center; justify-content: center;">
+                  <canvas id="chart-morosidad-gerencia" style="z-index: 2; position: relative; width: 100% !important; height: 100% !important;"></canvas>
+                  <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; z-index: 1; pointer-events: none;">
+                      <span id="morosidad-percent-text-gerencia" style="font-size: 1.55rem; font-weight: 800; color: var(--text-white, #1e293b); line-height: 1; font-family: 'Inter', sans-serif;">0.0%</span>
+                      <span style="font-size: 0.6rem; font-weight: 700; color: var(--text-dim, #64748b); letter-spacing: 1.2px; text-transform: uppercase; margin-top: 3px;">Riesgo</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Avance por Proyecto -->
+              <div class="chart-card" style="padding: 15px;">
+                <h3 class="chart-title" style="margin-bottom:0; text-transform:uppercase; font-size:11px; color:#ffffff;">Avance por Proyecto</h3>
+                <div id="avance-etapa-container" style="margin-top:10px; display:flex; flex-direction:column; gap:5px; font-size: 0.75em;">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <!-- ========================================== -->
+
+          <!-- Charts Row Admin -->
+          <div class="charts-row role-chart role-administrador" id="charts-row-admin-1" style="display:none;">
+            <div class="chart-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 class="chart-title" style="margin-bottom:0;">Composición del Inventario</h3>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-composition"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 class="chart-title" style="margin-bottom:0;">Cobranza del Mes</h3>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-cobranza-mes"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Panel Alertas Admin -->
+          <div class="data-card role-chart role-administrador" id="card-alertas-admin" style="margin-top:20px;display:none;">
+            <h3 class="card-title" style="margin:0;color:#e74c3c;"><i class="fa-solid fa-triangle-exclamation"></i> Próximos Vencimientos (30 días)</h3>
+            <div class="table-responsive" style="margin-top:14px;">
+              <div id="chart-alertas-admin-panel"></div>
+            </div>
+          </div>
+
+          <!-- Charts Row Vendedor -->
+          <div class="charts-row role-chart role-vendedor" id="charts-row-vendedor-1" style="display:none;">
+            <div class="chart-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 class="chart-title" style="margin-bottom:0;">Mi Embudo de Ventas</h3>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-funnel-personal"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Alertas Vendedor -->
+          <div class="data-card role-chart role-vendedor" id="card-alertas-vendedor" style="margin-top:20px;display:none;">
+            <h3 class="card-title" style="margin:0;color:#e74c3c;"><i class="fa-solid fa-triangle-exclamation"></i> Alertas de Reservas por Vencer</h3>
+            <div class="table-responsive" style="margin-top:14px;">
+              <div id="chart-alertas-vendedor-panel"></div>
+            </div>
+          </div>
+
+          <!-- Rentability Panel removed as requested -->
+
+          
+        </div>
+
+        <!--  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  — 
+             TAB: Mapa GIS
+                                                              -->
+        <div class="tab-panel active" id="panel-mapa">
+
+          <!-- Map Filters Bar -->
+          <div class="map-controls" id="map-controls-panel">
+            <div class="control-group" id="map-project-filter-group">
+              <label><i class="fa-solid fa-map-location-dot"></i> Proyecto</label>
+              <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
+                <select id="map-project-select" class="control-select" style="flex: 1;">
+                  <option value="todos">Todos los Proyectos</option>
+                  <!-- Opciones dinámicas inyectadas por JS -->
+                </select>
+                <button id="btn-ver-plano-loteo" class="btn btn-outline" style="display: inline-flex; padding: 0 12px; height: 38px; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--accent-green); color: var(--accent-green); background: rgba(16, 185, 129, 0.05); font-weight: 600; cursor: pointer; border-radius: var(--radius-sm); font-size: 0.85rem;" title="Ver Planos en Google Drive" onclick="window.open('https://drive.google.com/drive/folders/14NZyPP3I629am5hxRY6q4sDKHRrNBu5a?usp=drive_link', '_blank')">
+                  <i class="fa-solid fa-map"></i> <span>Planos</span>
+                </button>
+                <button type="button" id="btn-toggle-3d" onclick="window.APP5T_Map3D && window.APP5T_Map3D.toggle3D()" class="btn-3d-toggle" style="display: inline-flex; padding: 0 12px; height: 38px; align-items: center; justify-content: center; gap: 6px; border: 1px solid #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.08); font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); font-size: 0.82rem; box-shadow: 0 2px 8px rgba(0,229,255,0.2);" title="Alternar Vista 3D con Relieve (Modo PC)">
+                  <i class="fa-solid fa-cube"></i> <span id="lbl-toggle-3d">Vista 3D</span>
+                </button>
+              </div>
+            </div>
+            <div class="control-group" id="map-status-filter-group">
+              <label><i class="fa-solid fa-filter"></i> Estado</label>
+              <select id="map-status-filter" class="control-select">
+                <option value="todos">Todos</option>
+                <option value="Disponible">Disponible</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Reservada">Reservada</option>
+                <option value="Promesada">Promesada</option>
+                <option value="Vendida">Vendida</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- GIS Layout: Map + Panel -->
+          <div class="gis-layout">
+
+            <!-- Map (Dual Engine 2D Leaflet & 3D MapLibre) -->
+            <div class="map-container" style="position: relative;">
+              <div id="map-element" class="map-element" style="width: 100%; height: 100%;"></div>
+              <div id="map-3d-container" class="map-element" style="display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 10;"></div>
+
+              <!-- Cinematic & Relief 3D Tools (Visible only when 3D is active) -->
+              <div id="map-3d-action-bar" style="display: none; position: absolute; bottom: 20px; left: 14px; z-index: 50; gap: 6px; align-items: center; flex-wrap: wrap; background: rgba(8, 24, 38, 0.92); backdrop-filter: blur(12px); padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 6px 20px rgba(0,0,0,0.5);">
+                <button type="button" id="btn-3d-orbit" onclick="window.APP5T_Map3D && window.APP5T_Map3D.toggleCinematicOrbit()" style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; font-weight: 700; font-size: 0.76rem; padding: 5px 10px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                  <i class="fa-solid fa-video"></i> Giro 360°
+                </button>
+                <button type="button" onclick="window.APP5T_Map3D && window.APP5T_Map3D.setPitchAngle(70)" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; font-size: 0.74rem; padding: 5px 8px; border-radius: 6px; cursor: pointer;">
+                  <i class="fa-solid fa-mountain"></i> Relieve
+                </button>
+                <button type="button" onclick="window.APP5T_Map3D && window.APP5T_Map3D.setPitchAngle(0)" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; font-size: 0.74rem; padding: 5px 8px; border-radius: 6px; cursor: pointer;">
+                  <i class="fa-solid fa-arrow-down"></i> Cenital
+                </button>
+              </div>
+            </div>
+
+            <!-- Desktop: Lote Detail Panel -->
+            <div class="lote-panel" id="lote-panel">
+              <!-- Empty state (default) -->
+              <div class="empty-state" id="lote-empty">
+                <i class="fa-solid fa-map-pin bounce"></i>
+                <h3>Selecciona un Lote</h3>
+                <p>Haz clic en una parcela del mapa para interactuar.</p>
+              </div>
+              <!-- Lote details (hidden until selection) -->
+              <div id="lote-details" style="display:none">
+                <div class="lote-header">
+                  <div>
+                    <h2 id="lote-title" class="lote-title">Lote --</h2>
+                    <span id="lote-project" class="lote-project">--</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span id="lote-status-badge" class="status-badge">--</span>
+                    <button type="button" onclick="if(window.APP5T && window.APP5T.clearLoteSelection) window.APP5T.clearLoteSelection();" title="Cerrar Ficha" style="background:transparent; border:none; color:var(--text-dim); cursor:pointer; font-size:1.1rem; padding:2px 6px; border-radius:4px; transition:color 0.2s;" onmouseover="this.style.color='var(--text-white)'" onmouseout="this.style.color='var(--text-dim)'"><i class="fa-solid fa-xmark"></i></button>
+                  </div>
+                </div>
+                <div class="lote-specs">
+                  <div class="spec">
+                    <span class="spec-label">Superficie</span>
+                    <span id="lote-area" class="spec-value">--</span>
+                  </div>
+                  <div class="spec">
+                    <span class="spec-label">Precio Lista</span>
+                    <span id="lote-price" class="spec-value">--</span>
+                  </div>
+
+                </div>
+                <hr class="divider">
+                <div id="lote-action-form">
+                  <!-- Dynamic action form injected by JS based on role/status -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile: Bottom Sheet -->
+            <div class="bottom-sheet" id="bottom-sheet">
+              <button class="bottom-sheet-close" id="bottom-sheet-close" aria-label="Cerrar detalles">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+              <div class="bottom-sheet-handle" id="bottom-sheet-handle">
+                <div class="handle-bar"></div>
+              </div>
+              <div class="bottom-sheet-content" id="bottom-sheet-content">
+                <!-- Content cloned/managed by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  — 
+             TAB: Mis Leads (Vendedor)
+              —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  -->
+        <div class="tab-panel" id="panel-leads">
+          <div class="data-card" style="background: transparent; box-shadow: none; padding: 0;">
+            <div style="padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h3 class="card-title">Mis Clientes</h3>
+                <p class="card-subtitle">Seguimiento de clientes y prospectos asignados</p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <!-- Filtro por Vendedor (dinámico para Gerente y Administrador) -->
+                <select id="leads-filter-vendedor" class="form-select form-select-sm"
+                        onchange="if(window.APP5T && window.APP5T.filterLeadsByVendedor) window.APP5T.filterLeadsByVendedor(this.value);"
+                        style="display: none; height: 38px; border-radius: 8px; font-size: 0.82rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-white); padding: 0 10px; min-width: 170px;">
+                  <option value="all">Todos los Vendedores</option>
+                </select>
+
+                <div class="leads-search-wrapper" style="position: relative; width: 280px; flex: 1; min-width: 220px; max-width: 380px;">
+                  <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 0.85rem; pointer-events: none;"></i>
+                  <input type="text" id="leads-search-input" class="form-control" placeholder="Buscar por nombre, RUT, lote..."
+                         oninput="if(window.APP5T && window.APP5T.filterLeads) window.APP5T.filterLeads(this.value);"
+                         style="padding-left: 34px; padding-right: 32px; height: 38px; border-radius: 8px; font-size: 0.85rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-white); width: 100%;">
+                  <button id="leads-search-clear" onclick="if(window.APP5T && window.APP5T.clearLeadsSearch) window.APP5T.clearLeadsSearch();" 
+                          title="Limpiar búsqueda"
+                          style="display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 4px; font-size: 0.85rem;">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                  </button>
+                </div>
+                <button class="btn btn-secondary" id="btn-export-excel-misclientes" style="display: flex; align-items: center; gap: 8px; height: 38px;">
+                  <i class="fa-solid fa-file-excel" style="color: var(--accent-green);"></i> Exportar Excel
+                </button>
+              </div>
+            </div>
+            <!-- Barra de estado y filtro de búsqueda -->
+            <div id="leads-search-feedback" style="padding: 0 16px 12px 16px;"></div>
+            <div class="client-cards-container" id="leads-container">
+              <!-- Tarjetas inyectadas por JS -->
+            </div>
+          </div>
+        </div>
+
+        <!--  —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   — 
+             TAB: Aprobaciones (Gerente)
+              —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —  -->
+        <!--  — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — 
+             TAB: Aprobaciones (Gerente - 3 Pestañas Dinámicas)
+              — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — —  -->
+        <div class="tab-panel" id="panel-aprobaciones">
+          <div class="data-card" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+              <div>
+                <h3 class="card-title" style="margin: 0;">Bandeja de Aprobaciones</h3>
+                <p class="card-subtitle" style="margin: 4px 0 0 0;">Control y autorización gerencial de ventas y promesas</p>
+              </div>
+              <div class="aprobaciones-search-wrapper" style="position: relative; width: 280px;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 0.85rem; pointer-events: none;"></i>
+                <input type="text" id="aprobaciones-search-input" class="form-control" placeholder="Buscar lote, cliente, RUT..."
+                       oninput="if(window.APP5T && window.APP5T.filterAprobaciones) window.APP5T.filterAprobaciones(this.value);"
+                       style="padding-left: 34px; padding-right: 12px; height: 38px; border-radius: 8px; font-size: 0.85rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-white);">
+              </div>
+            </div>
+            <div style="font-size:0.75rem; letter-spacing:1px; color:var(--text-white); margin-bottom:12px; font-weight:700; text-transform:uppercase;">HISTORIAL DE PROCESOS</div>
+            <div id="list-aprobaciones">
+              <!-- Renderizado dinámico de los 3 desplegables con diseño de Mesa de Trabajo -->
+            </div>
+          </div>
+        </div>
+
+        <!--  — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — 
+             TAB: Control de Precios (Gerente)
+              — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — —  -->
+        <div class="tab-panel" id="panel-precios">
+          <div class="data-card">
+            <div class="card-header-flex" style="margin-bottom: 20px;">
+              <div>
+                <h3 class="card-title">Control de Precios</h3>
+                <p class="card-subtitle">Precios de lista y márgenes por lote</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="premium-table">
+                <thead>
+                  <tr>
+                    <th>Lote</th>
+                    <th>Proyecto</th>
+                    <th>Superficie</th>
+                    <th>Precio de Venta</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-precios">
+                  <!-- Rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!--  — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — 
+             TAB: Mesa Documental (Administración Original - 3 Secciones)
+              — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — —  -->
+        <div class="tab-panel" id="panel-mesa">
+          <!-- Card 1: Reservas Aprobadas -->
+          <div class="data-card" style="margin-bottom:24px;">
+            <div class="card-header-flex" style="margin-bottom:16px;">
+              <div>
+                <h3 class="card-title">Reservas Aprobadas</h3>
+                <p class="card-subtitle">Lotes listos para firma de promesa</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="premium-table">
+                <thead>
+                  <tr>
+                    <th>FECHA</th>
+                    <th>LOTE / PROYECTO</th>
+                    <th>TIPO</th>
+                    <th>CLIENTE</th>
+                    <th>VALOR</th>
+                    <th>DOCUMENTOS</th>
+                    <th style="text-align:right;">ACCIÓN</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-mesa-promesas">
+                  <!-- JS injected -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Card 2: Promesas en Curso -->
+          <div class="data-card" style="margin-bottom:24px;">
+            <div class="card-header-flex" style="margin-bottom:16px;">
+              <div>
+                <h3 class="card-title">Promesas en Curso</h3>
+                <p class="card-subtitle">Lotes promesados en proceso de pago y revisión</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="premium-table">
+                <thead>
+                  <tr>
+                    <th>FECHA</th>
+                    <th>LOTE / PROYECTO</th>
+                    <th>TIPO</th>
+                    <th>CLIENTE</th>
+                    <th>VALOR</th>
+                    <th>DOCUMENTOS</th>
+                    <th style="text-align:right;">ACCIÓN</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-mesa-promesas-curso">
+                  <!-- JS injected -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Card 3: Escrituraciones Pendientes -->
+          <div class="data-card">
+            <div class="card-header-flex" style="margin-bottom:16px;">
+              <div>
+                <h3 class="card-title">Escrituraciones Pendientes</h3>
+                <p class="card-subtitle">Lotes promesados y ventas directas listos para escrituración</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="premium-table">
+                <thead>
+                  <tr>
+                    <th>FECHA</th>
+                    <th>LOTE / PROYECTO</th>
+                    <th>TIPO</th>
+                    <th>CLIENTE</th>
+                    <th>VALOR</th>
+                    <th>DOCUMENTOS</th>
+                    <th style="text-align:right;">ACCIÓN</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-mesa-escrituras">
+                  <!-- JS injected -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+        <!--  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  — 
+             TAB: Cuenta Corriente (Administrador)
+              —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  -->
+        
+        <div class="tab-panel" id="panel-ctacte">
+          <div class="data-card">
+            <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+              <div>
+                <h3 class="card-title">Cuenta Corriente</h3>
+                <p class="card-subtitle">Control de cuotas y pagos</p>
+              </div>
+              <div class="ctacte-header-controls" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <!-- Buscador Rápido de Cuenta Corriente (Cliente, RUT o Lote) -->
+                <div class="filter-group ctacte-search-box" style="position: relative; min-width: 260px; max-width: 380px; flex: 1;">
+                  <div style="position: relative; display: flex; align-items: center;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; color: var(--accent-cyan, #00e5ff); font-size: 0.85rem; pointer-events: none;"></i>
+                    <input type="text" id="ctacte-search" list="dl-ctacte-search" class="form-control" placeholder="Buscar por cliente, RUT o lote..." autocomplete="off" style="padding-left: 34px; padding-right: 32px; height: 38px; width: 100%; border: 1px solid rgba(0, 229, 255, 0.35); border-radius: 6px; background: rgba(5, 22, 34, 0.85); color: #fff; font-size: 0.85rem;">
+                    <datalist id="dl-ctacte-search"></datalist>
+                    <button type="button" id="btn-clear-ctacte-search" style="display: none; position: absolute; right: 10px; background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 0.95rem; padding: 2px;" title="Limpiar búsqueda">
+                      <i class="fa-solid fa-circle-xmark"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Dropdown de Clientes (Preservado oculto para lógica interna y compatibilidad) -->
+                <select id="ctacte-filter-cliente" style="display: none;">
+                  <option value="all">-- Todos los Clientes --</option>
+                </select>
+                <div class="filter-group" id="ctacte-filter-lote-group" style="display: none; align-items: center; gap: 8px;">
+                  <label for="ctacte-filter-lote" style="font-weight: 500; color: var(--text-white); font-size: 0.9rem;">Seleccionar Lote:</label>
+                  <select id="ctacte-filter-lote" class="form-control" style="width: 200px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px;">
+                    <option value="all">-- Todos los Lotes --</option>
+                    <!-- Options injected by JS -->
+                  </select>
+                </div>
+                <div id="ctacte-actions" style="display: none; align-items: center; gap: 8px;">
+                  <button class="btn btn-warning btn-sm" onclick="APP5T_Forms.mostrarModalReprogramacion()" title="Reprogramar Deuda"><i class="fa-solid fa-calendar-alt"></i> Reprogramar</button>
+                </div>
+                <div id="ctacte-documents-container" class="dropdown" style="display: none; margin-left: 8px;">
+                  <!-- Injected by JS -->
+                </div>
+              </div>
+            </div>
+            <div id="ctacte-summary-cards"></div>
+            <div class="table-responsive">
+              <table class="premium-table">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Lote / Proyecto</th>
+                    <th>Cuota Nº</th>
+                    <th>Valor Cuota</th>
+                    <th>Vencimiento</th>
+                    <th>Pagado</th>
+                    <th>Estado</th>
+                    <th style="text-align:right">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-ctacte">
+                  <!-- Rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!--  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  — 
+             TAB: Informes Mensuales (Administrador)
+              —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  -->
+        <div class="tab-panel" id="panel-informes">
+          <!-- Selector de Informes: Command Deck de 4 Módulos Ejecutivos -->
+          <div class="informes-subtab-bar">
+            <button class="settings-subtab active tab-promesas" id="btn-rep-promesas" data-report="promesas">
+              <div class="subtab-icon-wrap"><i class="fa-solid fa-file-signature"></i></div>
+              <div class="subtab-text-wrap">
+                <span class="subtab-title">Promesas y Escrituras</span>
+                <span class="subtab-desc">Contratos y Cierre</span>
+              </div>
+            </button>
+            <button class="settings-subtab tab-ctacte" id="btn-rep-ctacte" data-report="ctacte">
+              <div class="subtab-icon-wrap"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+              <div class="subtab-text-wrap">
+                <span class="subtab-title">Cuenta Corriente</span>
+                <span class="subtab-desc">Recaudación y Saldos</span>
+              </div>
+            </button>
+            <button class="settings-subtab tab-ventas" id="btn-rep-ventas" data-report="ventas">
+              <div class="subtab-icon-wrap"><i class="fa-solid fa-chart-line"></i></div>
+              <div class="subtab-text-wrap">
+                <span class="subtab-title">Ventas por Vendedor</span>
+                <span class="subtab-desc">Rendimiento Comercial</span>
+              </div>
+            </button>
+            <button class="settings-subtab tab-cuotas" id="btn-rep-cuotas" data-report="cuotas">
+              <div class="subtab-icon-wrap"><i class="fa-solid fa-clock-rotate-left"></i></div>
+              <div class="subtab-text-wrap">
+                <span class="subtab-title">Cuotas y Vencimientos</span>
+                <span class="subtab-desc">Cartera y Cobranza</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- CONTENEDOR 1: Promesas y Escrituras -->
+          <div id="report-promesas-container" class="report-container active">
+            <div class="data-card">
+              <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                <div>
+                  <h3 class="card-title">Informes de Promesas y Escrituras</h3>
+                  <p class="card-subtitle">Control mensual consolidado y descarga de reportes</p>
+                </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+
+                  <button class="btn btn-secondary" id="btn-export-pdf-promesas" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-pdf" style="color: var(--accent-orange);"></i> Exportar PDF
+                  </button>
+                  <button class="btn btn-secondary" id="btn-export-excel-promesas" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-excel" style="color: var(--accent-green);"></i> Exportar Excel
+                  </button>
+                </div>
+              </div>
+              <!-- Mini-Consola Ejecutiva Gerencial (KPIs en tiempo real) -->
+              <div class="informes-kpi-deck" id="informes-promesas-kpis">
+                <div class="kpi-deck-card">
+                  <div class="kpi-deck-icon" style="color: #38bdf8;"><i class="fa-solid fa-file-signature"></i></div>
+                  <div class="kpi-deck-info">
+                    <span class="kpi-deck-label">Operaciones</span>
+                    <strong class="kpi-deck-val" id="kpi-report-operaciones">0</strong>
+                  </div>
+                </div>
+                <div class="kpi-deck-card">
+                  <div class="kpi-deck-icon" style="color: #60a5fa;"><i class="fa-solid fa-sack-dollar"></i></div>
+                  <div class="kpi-deck-info">
+                    <span class="kpi-deck-label">Total Ventas</span>
+                    <strong class="kpi-deck-val" id="kpi-report-ventas">$0</strong>
+                  </div>
+                </div>
+                <div class="kpi-deck-card">
+                  <div class="kpi-deck-icon" style="color: var(--accent-green);"><i class="fa-solid fa-circle-check"></i></div>
+                  <div class="kpi-deck-info">
+                    <span class="kpi-deck-label">Total Recaudado</span>
+                    <strong class="kpi-deck-val text-success" id="kpi-report-recibido">$0</strong>
+                  </div>
+                </div>
+                <div class="kpi-deck-card">
+                  <div class="kpi-deck-icon" style="color: var(--accent-orange);"><i class="fa-solid fa-clock"></i></div>
+                  <div class="kpi-deck-info">
+                    <span class="kpi-deck-label">Por Recibir</span>
+                    <strong class="kpi-deck-val text-warning" id="kpi-report-pendiente">$0</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="informes-filters-row" style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Mes:</label>
+                  <select id="informes-filter-mes" class="form-control" style="width: 150px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos --</option>
+                    <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+                    <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+                    <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+                    <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                  </select>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Año:</label>
+                  <select id="informes-filter-anio" class="form-control" style="width: 120px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos --</option>
+                    <option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option>
+                  </select>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Proyecto:</label>
+                  <select id="informes-filter-proyecto" class="form-control" style="width: 180px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos --</option>
+                  </select>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Buscar por Cliente o Lote:</label>
+                  <input type="text" id="informes-search" class="form-control" placeholder="Buscar..." style="background-color: var(--glass-bg); color: var(--text-white); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                </div>
+              </div>
+
+              <!-- Banner informativo específico para Móvil en Perfil Gerente -->
+              <div class="gerente-mobile-report-notice" id="gerente-notice-promesas">
+                <i class="fa-solid fa-circle-info" style="color: #38bdf8; font-size: 1.15rem; flex-shrink: 0;"></i>
+                <div>
+                  <strong style="color: #38bdf8; display: block; font-size: 0.82rem; margin-bottom: 2px;">Vista Ejecutiva Móvil</strong>
+                  <span style="font-size: 0.78rem; color: var(--text-dim); line-height: 1.35;">Filtre por mes, año o proyecto y descargue el informe consolidado en <strong>PDF</strong> o <strong>Excel</strong> para revisar el detalle por cliente y lote.</span>
+                </div>
+              </div>
+              <div id="wrap-table-informes-promesas" class="table-responsive gerente-mobile-hide">
+                <table class="premium-table" style="white-space: nowrap;">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th><th>Lote / Proyecto</th><th>Cliente</th><th>Valor Venta</th>
+                      <th>Pie / Anticipo</th><th>Cuotas Pagadas</th><th>Cuotas por Pagar</th>
+                      <th>Total Recibido</th><th>Por Recibir</th><th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-informes-promesas"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTENEDOR 2: Estado de Cuenta Corriente -->
+          <div id="report-ctacte-container" class="report-container" style="display:none;">
+            <div class="data-card">
+              <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                <div>
+                  <h3 class="card-title">Estado de Cuenta Corriente</h3>
+                  <p class="card-subtitle">Resumen consolidado por cliente y lote</p>
+                </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+
+                  <button class="btn btn-secondary" id="btn-export-pdf-ctacte" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-pdf" style="color: var(--accent-orange);"></i> Exportar PDF
+                  </button>
+                  <button class="btn btn-secondary" id="btn-export-excel-ctacte" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-excel" style="color: var(--accent-green);"></i> Exportar Excel
+                  </button>
+                </div>
+              </div>
+              <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Cliente (RUT o Nombre):</label>
+                  <input type="text" id="rep-ctacte-cliente" list="dl-ctacte-clientes" class="form-control" placeholder="Ej. 12345678-9" autocomplete="off" style="background-color: var(--glass-bg); color: var(--text-white); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                  <datalist id="dl-ctacte-clientes"></datalist>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Proyecto:</label>
+                  <select id="rep-ctacte-proyecto" class="form-control" style="width: 150px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos --</option>
+                  </select>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Lote:</label>
+                  <input type="text" id="rep-ctacte-lote" list="dl-ctacte-lotes" class="form-control" placeholder="Ej. M1-L1" autocomplete="off" style="background-color: var(--glass-bg); color: var(--text-white); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px; width: 100px;">
+                  <datalist id="dl-ctacte-lotes"></datalist>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2px;">
+                  <button type="button" id="btn-clear-ctacte-filters" class="btn btn-secondary" style="height: 38px; background-color: var(--glass-bg); color: var(--text-dim); border: 1px solid var(--glass-border);">
+                    <i class="fa-solid fa-eraser"></i> Limpiar
+                  </button>
+                </div>
+              </div>
+              <div id="informe-ctacte-statements" style="margin-top: 20px;">
+                <div id="informe-ctacte-placeholder" style="text-align: center; padding: 40px; background-color: var(--glass-bg); border: 1px dashed var(--glass-border); border-radius: 8px;">
+                  <i class="fa-solid fa-file-invoice" style="font-size: 3rem; color: var(--text-dim); margin-bottom: 16px;"></i>
+                  <h4 style="color: var(--text-white); margin-bottom: 8px;">Generador de Estados de Cuenta</h4>
+                  <p style="color: var(--text-dim); font-size: 0.9rem;">Por favor, busque y seleccione un <strong>Cliente</strong> o <strong>Lote</strong> en los filtros superiores para generar su informe detallado.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTENEDOR 3: Ventas por Vendedor -->
+          <div id="report-ventas-container" class="report-container" style="display:none;">
+            <div class="data-card">
+              <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                <div>
+                  <h3 class="card-title">Ventas por Vendedor</h3>
+                  <p class="card-subtitle">Volumen de ventas mensual por ejecutivo</p>
+                </div>
+                <div class="informes-export-actions" style="display: flex; gap: 8px; align-items: center;">
+                  <button class="btn btn-secondary" id="btn-export-pdf-ventas" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-pdf" style="color: var(--accent-orange);"></i> Exportar PDF
+                  </button>
+                  <button class="btn btn-secondary" id="btn-export-excel-ventas" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-excel" style="color: var(--accent-green);"></i> Exportar Excel
+                  </button>
+                </div>
+              </div>
+              <div class="informes-filters-row" style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Proyecto:</label>
+                  <select id="rep-ventas-proyecto" class="form-control" style="width: 180px; border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos los Proyectos --</option>
+                  </select>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Vendedor:</label>
+                  <select id="rep-ventas-vendedor" class="form-control" style="width: 150px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos --</option>
+                  </select>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Mes:</label>
+                  <select id="rep-ventas-mes" class="form-control" style="width: 150px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos --</option>
+                    <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+                    <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+                    <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+                    <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                  </select>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Año:</label>
+                  <select id="rep-ventas-anio" class="form-control" style="width: 100px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos --</option>
+                    <option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option>
+                  </select>
+                </div>
+              </div>
+              <div id="informe-ventas-detalle" style="margin-top: 30px;"></div>
+            </div>
+          </div>
+
+          <!-- CONTENEDOR 4: Cuotas Vencidas / Por Vencer -->
+          <div id="report-cuotas-container" class="report-container" style="display:none;">
+            <div class="data-card">
+              <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                <div>
+                  <h3 class="card-title">Cuotas Vencidas y Por Vencer</h3>
+                  <p class="card-subtitle">Control de cartera y cobranza pendiente</p>
+                </div>
+                <div class="informes-export-actions" style="display: flex; gap: 8px; align-items: center;">
+                  <button class="btn btn-secondary" id="btn-export-pdf-cuotas" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-pdf" style="color: var(--accent-orange);"></i> Exportar PDF
+                  </button>
+                  <button class="btn btn-secondary" id="btn-export-excel-cuotas" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-excel" style="color: var(--accent-green);"></i> Exportar Excel
+                  </button>
+                </div>
+              </div>
+              <div class="informes-filters-row" style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Proyecto:</label>
+                  <select id="rep-cuotas-proyecto" class="form-control" style="width: 180px; border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos los Proyectos --</option>
+                  </select>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Estado:</label>
+                  <select id="rep-cuotas-estado" class="form-control" style="width: 150px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                    <option value="all">-- Todos --</option>
+                    <option value="vencida">Vencidas</option>
+                    <option value="por_vencer">Por Vencer</option>
+                  </select>
+                </div>
+                <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px;">
+                  <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Buscar Cliente / Lote:</label>
+                  <input type="text" id="rep-cuotas-search" class="form-control" placeholder="Buscar..." style="background-color: var(--glass-bg); color: var(--text-white); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="premium-table">
+                  <thead>
+                    <tr>
+                      <th>Vencimiento</th><th>Días</th><th>Cliente</th><th>Lote</th><th>Proyecto</th>
+                      <th>Concepto</th><th>Monto</th><th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-informes-cuotas"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!--  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  — 
+             TAB: Carga de Datos (Administrador)
+              —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  -->
+        
+        <div class="tab-panel" id="panel-carga">
+          <div class="data-card">
+            <h3 class="card-title">Carga de Datos Base</h3>
+            <p class="card-subtitle">Gestión de entidades del sistema</p>
+
+            <!-- Entity sub-tabs -->
+            <div class="crud-tabs" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px;">
+              <button class="crud-tab active" data-entity="vendedores" onclick="if(window.APP5T && window.APP5T._switchCrudTab) window.APP5T._switchCrudTab('vendedores', this);" style="padding: 8px 16px; border-radius: 6px; font-weight: 500;">Vendedores</button>
+              <button class="crud-tab" data-entity="clientes" onclick="if(window.APP5T && window.APP5T._switchCrudTab) window.APP5T._switchCrudTab('clientes', this);" style="padding: 8px 16px; border-radius: 6px; font-weight: 500;">Clientes</button>
+              <button class="crud-tab" data-entity="directorio" onclick="if(window.APP5T && window.APP5T._switchCrudTab) window.APP5T._switchCrudTab('directorio', this);" style="padding: 8px 16px; border-radius: 6px; font-weight: 500;">Directorio</button>
+              <button class="crud-tab" data-entity="proyectos" onclick="if(window.APP5T && window.APP5T._switchCrudTab) window.APP5T._switchCrudTab('proyectos', this);" style="padding: 8px 16px; border-radius: 6px; font-weight: 500;">Proyectos</button>
+              <button class="crud-tab" data-entity="etapas" onclick="if(window.APP5T && window.APP5T._switchCrudTab) window.APP5T._switchCrudTab('etapas', this);" style="padding: 8px 16px; border-radius: 6px; font-weight: 500;">Etapas</button>
+            </div>
+
+            <!-- Dynamic CRUD table + form -->
+            <div id="crud-content">
+              <!-- Content injected by JS based on selected entity -->
+            </div>
+          </div>
+        </div>
+
+        <!--  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  — 
+             TAB: Inventario (Gerente / Administrador)
+              —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  -->
+        <div class="tab-panel" id="panel-inventario">
+          <div class="data-card">
+            <div class="card-header-flex" style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h3 class="card-title">Inventario General</h3>
+                <p class="card-subtitle">Todas las parcelas del ecosistema</p>
+              </div>
+              <div id="inv-header-actions" style="display: flex; gap: 8px;"></div>
+            </div>
+
+            <!-- Filtros agrupados -->
+            <div class="inventario-filters-row" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+              <div class="control-group" style="flex: 1; min-width: 140px; margin: 0;">
+                <label>Proyecto</label>
+                <select id="inv-filter-project" class="control-select" style="width: 100%;">
+                  <option value="all">Todos</option>
+                  <option value="El Copihue">El Copihue</option>
+                  <option value="Las Brisas">Las Brisas</option>
+                  <option value="Los Encinos">Los Encinos</option>
+                  <option value="Los Naranjos">Los Naranjos</option>
+                </select>
+              </div>
+              <div class="control-group" style="flex: 1; min-width: 140px; margin: 0;">
+                <label>Estado</label>
+                <select id="inv-filter-estado" class="control-select" style="width: 100%;">
+                  <option value="all">Todos</option>
+                  <option value="Disponible">Disponible</option>
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Reservada">Reservada</option>
+                  <option value="Promesada">Promesada</option>
+                  <option value="Venta_Directa">Venta Directa</option>
+                  <option value="Bloqueado">Bloqueado</option>
+                  <option value="Vendida">Vendida</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Resumen como Tabla -->
+            <div id="inventario-resumen-tabla" style="margin: 16px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--glass-border, rgba(255,255,255,0.08));"></div>
+
+            <div class="table-responsive inventario-table-responsive">
+              <table class="premium-table tbl-inventario-compact">
+                <thead>
+                  <tr>
+                    <th style="width: 70px; text-align: center;">Lote</th>
+                    <th style="width: 220px; text-align: left;">Proyecto</th>
+                    <th style="width: 150px; text-align: right; padding-right: 18px;">Superficie</th>
+                    <th style="width: 170px; text-align: right; padding-right: 18px;">Precio</th>
+                    <th style="width: 160px; text-align: center;">Estado</th>
+                    <th style="width: 150px; text-align: center;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-inventario">
+                  <!-- Rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Contenedor para lista de tarjetas en móvil -->
+            <div id="inventario-mobile-list" class="inventario-mobile-list" style="display: none; flex-direction: column; gap: 12px; margin-top: 12px;"></div>
+          </div>
+        </div>
+
+        <!--  —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   — 
+             TAB: Auditoría
+              —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  -->
+        <div class="tab-panel" id="panel-auditoria">
+          <div class="data-card">
+            <h3 class="card-title">Registro de Auditoría</h3>
+            <p class="card-subtitle">Log cronológico de acciones del sistema</p>
+            <div class="table-responsive">
+              <table class="premium-table">
+                <thead>
+                  <tr>
+                    <th>Fecha / Hora</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                    <th>Tabla</th>
+                    <th>Detalles</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-auditoria">
+                  <!-- Rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!--  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  — 
+             TAB: Configuración del Sistema (Administrador)
+              —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  —  -->
+        <div class="tab-panel" id="panel-admin-general">
+          
+          <!-- Sub-tabs header for administrator panel -->
+          <div style="display: flex; gap: 15px; border-bottom: 1px solid var(--glass-border); margin-bottom: 24px; padding-bottom: 1px;">
+            <button class="settings-subtab active" id="btn-settings-perms" style="background: transparent; border: none; border-bottom: 3px solid var(--primary); color: var(--text-white); padding: 12px 18px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-family: 'Inter', sans-serif;">
+              <i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Matriz de Permisos
+            </button>
+            <button class="settings-subtab" id="btn-settings-users" style="background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-dim); padding: 12px 18px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-family: 'Inter', sans-serif;" onmouseover="this.style.color='var(--text-white)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-dim)'">
+              <i class="fa-solid fa-users-gear"></i> Gestión de Usuarios
+            </button>
+          </div>
+
+          <!-- Sub-panel 1: Permissions Matrix -->
+          <div id="settings-perms-content">
+            <div class="data-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-matrix"></i> Matriz de Gobernanza Dinámica</h3>
+                  <p class="card-subtitle">Controla en tiempo real qué módulos visuales y de negocio puede ver cada rol.</p>
+                </div>
+                <button id="btn-save-permissions" class="btn btn-success" style="padding: 10px 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <i class="fa-solid fa-floppy-disk"></i> Guardar
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="premium-table">
+                  <thead>
+                    <tr>
+                      <th>Componente / Módulo</th>
+                      <th>Descripción</th>
+                      <th style="text-align: center; width: 120px;">Vendedor</th>
+                      <th style="text-align: center; width: 120px;">Gerencia</th>
+                      <th style="text-align: center; width: 120px;">Administración</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-permissions-matrix">
+                    <!-- Rows loaded from 00_Gobernanza_Permisos in Sheets -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-panel 2: User Accounts Management -->
+          <div id="settings-users-content" >
+            <div class="data-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-user-lock"></i> Gestión de Usuarios del Ecosistema</h3>
+                  <p class="card-subtitle">Crea, edita o bloquea el acceso de vendedores, directores y administradores.</p>
+                </div>
+                <button id="btn-add-user" class="btn btn-primary" style="padding: 10px 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <i class="fa-solid fa-user-plus"></i> Agregar Nuevo Usuario
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="premium-table">
+                  <thead>
+                    <tr>
+                      <th>RUT Usuario</th>
+                      <th>Nombre Completo</th>
+                      <th>Rol Asignado</th>
+                      <th>Estado</th>
+                      <th style="text-align: right; width: 180px;">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-users-list">
+                    <!-- Rows loaded from 00_Usuarios in Sheets -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      <!-- /tab-container -->
+    </main>
+  </div><!-- /app-layout -->
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <div class="mobile-nav-bar" id="mobile-nav-bar"></div>
+  <!-- /app-layout -->
+
+
+  <!-- """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+       MODAL: Generic Action Modal
+       """""""""""""""""""""""""""""""""""""""""""""""""""""""""" -->
+  <div id="action-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Modal</h3>
+        <button class="modal-close" id="modal-close" onclick="if(window.APP5T && window.APP5T.closeModal) { window.APP5T.closeModal(true); } const m = document.getElementById('action-modal'); if(m) { m.classList.remove('active', 'visible'); }">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Dynamic modal content injected by JS -->
+      </div>
+    </div>
+  </div>
+
+
+  <!--  — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — 
+       TOAST NOTIFICATION CONTAINER
+        — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " —  -->
+  <div id="toast-container" class="toast-container"></div>
+
+
+  <!--  — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — 
+       SCRIPTS
+        — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " — " —  -->
+
+  <!-- Leaflet 1.9.4 JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+          crossorigin=""></script>
+
+  <!-- MapLibre GL 3.6.2 JS (Motor 3D PC) -->
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- jsPDF (expone window.jspdf.jsPDF para generación directa de PDFs) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- SheetJS para exportación a Excel -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+  <!-- GeoJSON Layers (spatial data only) -->
+  <script src="../03_CORAZON/layers/brisas_master.js?v=20260924_1541"></script>
+  <script src="../03_CORAZON/layers/copihue_master.js?v=20260924_1541"></script>
+  <script src="../03_CORAZON/layers/encinos_master.js?v=20260924_1541"></script>
+  <script src="../03_CORAZON/layers/naranjos_master.js?v=20260924_1541"></script>
+
+  <!-- Supabase Configuration -->
+  <script>
+    window.APP5T_CONFIG = {
+      SUPABASE_URL: 'https://lsbnvsjosasbtarfqkse.supabase.co/rest/v1/',
+      SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzYm52c2pvc2FzYnRhcmZxa3NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNDYwMDEsImV4cCI6MjEwMjcyMjAwMX0.hE7F-9S3D4FXSF8vDK7Y5VLp2x-XCGnhel7jeHr8_Gg'
+    };
+  </script>
+
+  <!-- App Modules -->
+  <script src="js/utils.js?v=20261013_1430"></script>
+  <script src="js/db.js?v=20261013_1430"></script>
+  <script src="js/sync.js?v=20261013_1430"></script>
+  <script src="js/map_3d.js?v=20261013_1430"></script>
+  <script src="js/map.js?v=20261013_1430"></script>
+  <script src="js/charts.js?v=20261013_1430"></script>
+  <script src="js/forms.js?v=20261030_1530"></script>
+  <script src="js/excel_reports.js?v=20261030_1530"></script>
+  <script src="js/drive_catalog.js?v=20261031_1850"></script>
+  <script src="js/app.js?v=20261013_1430"></script>
+  <!-- ================================================================
+       MODAL: NOTIFICATIONS (Solicitudes Pendientes)
+       ================================================================ -->
+  <div class="modal-overlay" id="modal-notifications">
+    <div class="modal" style="max-width: 800px; width: 95%;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-regular fa-bell" style="margin-right:8px; color:var(--accent-orange);"></i> Mis Solicitudes Pendientes</h3>
+        <button class="modal-close" onclick="APP5T_Modals.close('modal-notifications')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" style="padding: 16px;">
+        <p class="card-subtitle" style="margin-bottom:16px;">Lotes solicitados que esperan aprobación del Gerente.</p>
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Lote</th>
+                <th>Proyecto</th>
+                <th>Fecha Solicitud</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-pending-approvals">
+              <!-- Rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Theme Switcher Logic (Clásico vs InmoCMS Modern Clean SaaS) ──
+    (function() {
+      function initThemeSwitcher() {
+        const btn = document.getElementById('btn-theme-switch');
+
+        function updateBtnUI(theme) {
+          if (!btn) return;
+          if (theme === 'inmo') {
+            btn.title = 'Cambiar a Diseño Clásico (Dark Glassmorphic)';
+            btn.innerHTML = '<i class="fa-solid fa-moon"></i> <span id="theme-switch-label">Modo Clásico</span>';
+          } else {
+            btn.title = 'Cambiar a Diseño Moderno (InmoCMS Light)';
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span id="theme-switch-label">Diseño Inmo</span>';
+          }
+        }
+
+        const currentTheme = localStorage.getItem('app5t_design_theme') || 'dark';
+        updateBtnUI(currentTheme);
+
+        if (btn) {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const active = document.documentElement.getAttribute('data-theme') || 'dark';
+            const nextTheme = (active === 'inmo') ? 'dark' : 'inmo';
+
+            document.documentElement.setAttribute('data-theme', nextTheme);
+            if (nextTheme === 'inmo') {
+              document.body.classList.add('theme-inmo');
+            } else {
+              document.body.classList.remove('theme-inmo');
+            }
+            localStorage.setItem('app5t_design_theme', nextTheme);
+            if (typeof APP5T_Charts !== 'undefined' && APP5T_Charts.updateTheme) {
+              APP5T_Charts.updateTheme();
+            }
+            updateBtnUI(nextTheme);
+
+            if (typeof APP5T_Utils !== 'undefined' && APP5T_Utils.showToast) {
+              APP5T_Utils.showToast(nextTheme === 'inmo' ? 'Diseño Moderno Inmo activado' : 'Diseño Clásico activado', 'info');
+            }
+
+            // Adjust Chart.js defaults
+            if (typeof Chart !== 'undefined') {
+              Chart.defaults.color = (nextTheme === 'inmo') ? '#334155' : '#ffffff';
+              if (Chart.defaults.plugins && Chart.defaults.plugins.legend && Chart.defaults.plugins.legend.labels) {
+                Chart.defaults.plugins.legend.labels.color = (nextTheme === 'inmo') ? '#334155' : '#ffffff';
+              }
+            }
+
+            window.dispatchEvent(new Event('resize'));
+          });
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeSwitcher);
+      } else {
+        initThemeSwitcher();
+      }
+    })();
+  </script>
+    <!-- Modal Reprogramaciï¿½n Deuda -->
+  
+  </div>
+<div class="modal-overlay" id="modal-reprogramacion" onclick="if(event.target===this) this.classList.remove('visible')">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-calendar-alt" style="color:var(--accent-orange);"></i> Reprogramar Deuda</h3>
+        <button class="btn btn-ghost" onclick="document.getElementById('modal-reprogramacion').classList.remove('visible')" style="font-size:1.2rem; padding:5px 10px;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <p style="color:var(--text-dim); margin-bottom: 20px;">Redefine el número de cuotas para el saldo pendiente.</p>
+        
+        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--glass-border);">
+          <div style="display:flex; justify-content:space-between; margin-bottom: 10px;">
+            <span style="color:var(--text-dim);">Saldo Pendiente:</span>
+            <strong id="repro-saldo" style="color:var(--text-white); font-size: 1.1rem;">-</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-dim);">Cuotas Restantes Originales:</span>
+            <strong id="repro-cuotas-originales" style="color:var(--text-light);">-</strong>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nuevo Número de Cuotas (del saldo)</label>
+            <input type="number" id="repro-nuevas-cuotas" class="form-control" min="1" step="1" required>
+          </div>
+          <div class="form-group">
+            <label>Fecha 1ra Cuota Nueva</label>
+            <input type="date" id="repro-fecha-inicio" class="form-control" required>
+          </div>
+        </div>
+        
+        <input type="hidden" id="repro-id-propiedad">
+        <input type="hidden" id="repro-id-cliente">
+        
+        <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('modal-reprogramacion').classList.remove('visible')">Cancelar</button>
+          <button type="button" class="btn btn-warning" onclick="APP5T_Forms._procesarReprogramacion(event)"><i class="fa-solid fa-check"></i> Aplicar Reprogramación</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').catch(function(err) {
+          console.log('SW registration notice:', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
+
+
+
+
