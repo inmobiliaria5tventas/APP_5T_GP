@@ -1518,3 +1518,87 @@ html[data-theme="inmo"] #panel-ctacte .data-card {
   background: #2563eb !important;
   color: #ffffff !important;
 }
+
+/* ==========================================================================
+   20. RESPONSIVE MOBILE ENHANCEMENTS PARA MÓDULO DE INFORMES
+   ========================================================================== */
+@media (max-width: 768px) {
+  html[data-theme="inmo"] .informes-subtab-bar {
+    background: transparent !important;
+    padding: 0 !important;
+    gap: 8px !important;
+  }
+
+  html[data-theme="inmo"] #panel-informes .settings-subtab {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+    padding: 8px 8px !important;
+    min-height: 52px !important;
+  }
+
+  html[data-theme="inmo"] #panel-informes .settings-subtab .subtab-title {
+    color: #0f172a !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    white-space: normal !important;
+    line-height: 1.18 !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  html[data-theme="inmo"] #panel-informes .settings-subtab.active .subtab-title {
+    color: #2563eb !important;
+  }
+
+  /* Cifras de cuadros de colores sin truncamiento */
+  html[data-theme="inmo"] .informes-kpi-deck {
+    gap: 8px !important;
+  }
+
+  html[data-theme="inmo"] .informes-kpi-deck .kpi-deck-card {
+    min-height: 82px !important;
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+  }
+
+  html[data-theme="inmo"] .informes-kpi-deck .kpi-deck-label {
+    font-size: 0.64rem !important;
+    font-weight: 700 !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    white-space: nowrap !important;
+  }
+
+  html[data-theme="inmo"] .informes-kpi-deck .kpi-deck-val {
+    font-size: clamp(0.85rem, 3.6vw, 1.15rem) !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+  }
+
+  /* Botones de exportación después de los filtros */
+  html[data-theme="inmo"] .informes-export-bar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-bottom: 16px !important;
+  }
+
+  html[data-theme="inmo"] .informes-export-bar button {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #1e293b !important;
+    font-weight: 700 !important;
+    padding: 10px 8px !important;
+    font-size: 0.82rem !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+  }
+
+  html[data-theme="inmo"] .informes-export-bar button:hover {
+    background: #f8fafc !important;
+    border-color: #94a3b8 !important;
+  }
+}

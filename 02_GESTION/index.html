@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
   <!--  —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   — 
@@ -57,9 +57,9 @@
 
 
   <!-- App Design System -->
-  <link rel="stylesheet" href="index.css?v=20261104_1317">
+  <link rel="stylesheet" href="index.css?v=20261104_1420">
   <!-- Diseño Alternativo InmoCMS Modern Clean SaaS -->
-  <link rel="stylesheet" href="theme-inmo.css?v=20261104_1317">
+  <link rel="stylesheet" href="theme-inmo.css?v=20261104_1420">
   <!-- Tailwind CSS CDN for Login and Settings Panel -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -873,19 +873,10 @@
           <!-- CONTENEDOR 1: Promesas y Escrituras -->
           <div id="report-promesas-container" class="report-container active">
             <div class="data-card">
-              <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+              <div class="card-header-flex" style="margin-bottom: 20px;">
                 <div>
                   <h3 class="card-title">Informes de Promesas y Escrituras</h3>
                   <p class="card-subtitle">Control mensual consolidado y descarga de reportes</p>
-                </div>
-              <div style="display: flex; gap: 8px; align-items: center;">
-
-                  <button class="btn btn-secondary" id="btn-export-pdf-promesas" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-file-pdf" style="color: var(--accent-orange);"></i> Exportar PDF
-                  </button>
-                  <button class="btn btn-secondary" id="btn-export-excel-promesas" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-file-excel" style="color: var(--accent-green);"></i> Exportar Excel
-                  </button>
                 </div>
               </div>
               <!-- Mini-Consola Ejecutiva Gerencial (KPIs en tiempo real) -->
@@ -920,7 +911,7 @@
                 </div>
               </div>
 
-              <div class="informes-filters-row" style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+              <div class="informes-filters-row" style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end;">
                 <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
                   <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Mes:</label>
                   <select id="informes-filter-mes" class="form-control" style="width: 150px;   border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
@@ -950,6 +941,17 @@
                 </div>
               </div>
 
+              <!-- Botones de Exportación ubicados después de los filtros -->
+              <div class="informes-export-bar" style="display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" id="btn-export-excel-promesas" style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                  <i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Exportar Excel
+                </button>
+                <button class="btn btn-secondary" id="btn-export-pdf-promesas" style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                  <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Exportar PDF
+                </button>
+              </div>
+              </div>
+
               <!-- Banner informativo específico para Móvil en Perfil Gerente -->
               <div class="gerente-mobile-report-notice" id="gerente-notice-promesas">
                 <i class="fa-solid fa-circle-info" style="color: #38bdf8; font-size: 1.15rem; flex-shrink: 0;"></i>
@@ -976,22 +978,13 @@
           <!-- CONTENEDOR 2: Estado de Cuenta Corriente -->
           <div id="report-ctacte-container" class="report-container" style="display:none;">
             <div class="data-card">
-              <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+              <div class="card-header-flex" style="margin-bottom: 20px;">
                 <div>
                   <h3 class="card-title">Estado de Cuenta Corriente</h3>
                   <p class="card-subtitle">Resumen consolidado por cliente y lote</p>
                 </div>
-              <div style="display: flex; gap: 8px; align-items: center;">
-
-                  <button class="btn btn-secondary" id="btn-export-pdf-ctacte" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-file-pdf" style="color: var(--accent-orange);"></i> Exportar PDF
-                  </button>
-                  <button class="btn btn-secondary" id="btn-export-excel-ctacte" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-file-excel" style="color: var(--accent-green);"></i> Exportar Excel
-                  </button>
-                </div>
               </div>
-              <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+              <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end;">
                 <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
                   <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Cliente (RUT o Nombre):</label>
                   <input type="text" id="rep-ctacte-cliente" list="dl-ctacte-clientes" class="form-control" placeholder="Ej. 12345678-9" autocomplete="off" style="background-color: var(--glass-bg); color: var(--text-white); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
@@ -1014,6 +1007,17 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Botones de Exportación ubicados después de los filtros -->
+              <div class="informes-export-bar" style="display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" id="btn-export-excel-ctacte" style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                  <i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Exportar Excel
+                </button>
+                <button class="btn btn-secondary" id="btn-export-pdf-ctacte" style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                  <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Exportar PDF
+                </button>
+              </div>
+
               <div id="informe-ctacte-statements" style="margin-top: 20px;">
                 <div id="informe-ctacte-placeholder" style="text-align: center; padding: 40px; background-color: var(--glass-bg); border: 1px dashed var(--glass-border); border-radius: 8px;">
                   <i class="fa-solid fa-file-invoice" style="font-size: 3rem; color: var(--text-dim); margin-bottom: 16px;"></i>
@@ -1027,21 +1031,13 @@
           <!-- CONTENEDOR 3: Ventas por Vendedor -->
           <div id="report-ventas-container" class="report-container" style="display:none;">
             <div class="data-card">
-              <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+              <div class="card-header-flex" style="margin-bottom: 20px;">
                 <div>
                   <h3 class="card-title">Ventas por Vendedor</h3>
                   <p class="card-subtitle">Volumen de ventas mensual por ejecutivo</p>
                 </div>
-                <div class="informes-export-actions" style="display: flex; gap: 8px; align-items: center;">
-                  <button class="btn btn-secondary" id="btn-export-pdf-ventas" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-file-pdf" style="color: var(--accent-orange);"></i> Exportar PDF
-                  </button>
-                  <button class="btn btn-secondary" id="btn-export-excel-ventas" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-file-excel" style="color: var(--accent-green);"></i> Exportar Excel
-                  </button>
-                </div>
               </div>
-              <div class="informes-filters-row" style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+              <div class="informes-filters-row" style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end;">
                 <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
                   <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Proyecto:</label>
                   <select id="rep-ventas-proyecto" class="form-control" style="width: 180px; border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
@@ -1072,6 +1068,17 @@
                   </select>
                 </div>
               </div>
+
+              <!-- Botones de Exportación ubicados después de los filtros -->
+              <div class="informes-export-bar" style="display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" id="btn-export-excel-ventas" style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                  <i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Exportar Excel
+                </button>
+                <button class="btn btn-secondary" id="btn-export-pdf-ventas" style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                  <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Exportar PDF
+                </button>
+              </div>
+
               <div id="informe-ventas-detalle" style="margin-top: 30px;"></div>
             </div>
           </div>
@@ -1079,21 +1086,13 @@
           <!-- CONTENEDOR 4: Cuotas Vencidas / Por Vencer -->
           <div id="report-cuotas-container" class="report-container" style="display:none;">
             <div class="data-card">
-              <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+              <div class="card-header-flex" style="margin-bottom: 20px;">
                 <div>
                   <h3 class="card-title">Cuotas Vencidas y Por Vencer</h3>
                   <p class="card-subtitle">Control de cartera y cobranza pendiente</p>
                 </div>
-                <div class="informes-export-actions" style="display: flex; gap: 8px; align-items: center;">
-                  <button class="btn btn-secondary" id="btn-export-pdf-cuotas" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-file-pdf" style="color: var(--accent-orange);"></i> Exportar PDF
-                  </button>
-                  <button class="btn btn-secondary" id="btn-export-excel-cuotas" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-file-excel" style="color: var(--accent-green);"></i> Exportar Excel
-                  </button>
-                </div>
               </div>
-              <div class="informes-filters-row" style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+              <div class="informes-filters-row" style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end;">
                 <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
                   <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Proyecto:</label>
                   <select id="rep-cuotas-proyecto" class="form-control" style="width: 180px; border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
@@ -1112,6 +1111,16 @@
                   <label style="font-weight: 600; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Buscar Cliente / Lote:</label>
                   <input type="text" id="rep-cuotas-search" class="form-control" placeholder="Buscar..." style="background-color: var(--glass-bg); color: var(--text-white); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 4px; height: 38px;">
                 </div>
+              </div>
+
+              <!-- Botones de Exportación ubicados después de los filtros -->
+              <div class="informes-export-bar" style="display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" id="btn-export-excel-cuotas" style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                  <i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Exportar Excel
+                </button>
+                <button class="btn btn-secondary" id="btn-export-pdf-cuotas" style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                  <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Exportar PDF
+                </button>
               </div>
               <div class="table-responsive">
                 <table class="premium-table">
@@ -1395,16 +1404,16 @@
   </script>
 
   <!-- App Modules -->
-  <script src="js/utils.js?v=20261104_1317"></script>
-  <script src="js/db.js?v=20261104_1317"></script>
-  <script src="js/sync.js?v=20261104_1317"></script>
-  <script src="js/map_3d.js?v=20261104_1317"></script>
-  <script src="js/map.js?v=20261104_1317"></script>
-  <script src="js/charts.js?v=20261104_1317"></script>
-  <script src="js/forms.js?v=20261104_1317"></script>
-  <script src="js/excel_reports.js?v=20261104_1317"></script>
-  <script src="js/drive_catalog.js?v=20261104_1317"></script>
-  <script src="js/app.js?v=20261104_1317"></script>
+  <script src="js/utils.js?v=20261104_1420"></script>
+  <script src="js/db.js?v=20261104_1420"></script>
+  <script src="js/sync.js?v=20261104_1420"></script>
+  <script src="js/map_3d.js?v=20261104_1420"></script>
+  <script src="js/map.js?v=20261104_1420"></script>
+  <script src="js/charts.js?v=20261104_1420"></script>
+  <script src="js/forms.js?v=20261104_1420"></script>
+  <script src="js/excel_reports.js?v=20261104_1420"></script>
+  <script src="js/drive_catalog.js?v=20261104_1420"></script>
+  <script src="js/app.js?v=20261104_1420"></script>
   <!-- ================================================================
        MODAL: NOTIFICATIONS (Solicitudes Pendientes)
        ================================================================ -->

@@ -6992,43 +6992,79 @@ body.map-tab-active {
     padding: 14px 10px !important;
   }
 
-  /* 1. Selector de Sub-pestañas: Grid 2x2 para ver las 4 pestañas simultáneamente */
+  /* 1. Selector de Sub-pestañas: Grid 2x2 para ver las 4 pestañas simultáneamente sin truncar */
   .informes-subtab-bar {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 8px !important;
-    padding: 6px !important;
+    padding: 0 !important;
     margin-bottom: 16px !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     white-space: normal !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    background: rgba(8, 19, 32, 0.9) !important;
+    background: transparent !important;
   }
 
   #panel-informes .settings-subtab {
     width: 100% !important;
-    padding: 8px 6px !important;
+    min-width: 0 !important;
+    padding: 8px 8px !important;
     font-size: 0.74rem !important;
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: 5px !important;
-    text-align: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    text-align: left !important;
     white-space: normal !important;
-    border-radius: 8px !important;
-    min-height: 42px !important;
+    border-radius: 10px !important;
+    min-height: 52px !important;
     box-sizing: border-box !important;
     line-height: 1.15 !important;
   }
 
-  #panel-informes .settings-subtab i {
-    font-size: 0.8rem !important;
+  #panel-informes .settings-subtab .subtab-icon-wrap {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    font-size: 0.95rem !important;
+    border-radius: 8px !important;
     flex-shrink: 0 !important;
   }
 
-  /* 2. Cuadrícula de KPIs Ejecutivos: 2 columnas compactas sin desborde */
+  #panel-informes .settings-subtab .subtab-text-wrap {
+    min-width: 0 !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    overflow: visible !important;
+  }
+
+  #panel-informes .settings-subtab .subtab-title {
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    white-space: normal !important;
+    line-height: 1.18 !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: normal !important;
+    display: block !important;
+    margin: 0 !important;
+  }
+
+  #panel-informes .settings-subtab .subtab-desc {
+    display: none !important;
+  }
+
+  #panel-informes .settings-subtab i {
+    font-size: 0.85rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 2. Cuadrícula de KPIs Ejecutivos: Cifras y etiquetas completas sin truncamiento */
   .informes-kpi-deck {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -7040,39 +7076,68 @@ body.map-tab-active {
   }
 
   .kpi-deck-card {
-    padding: 8px 10px !important;
-    gap: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    padding: 10px 12px !important;
+    min-height: 82px !important;
     min-width: 0 !important;
+    border-radius: 12px !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
+    gap: 4px !important;
   }
 
   .kpi-deck-icon {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 0.95rem !important;
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    font-size: 0.85rem !important;
+    border-radius: 6px !important;
+    margin-bottom: 2px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     flex-shrink: 0 !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
   }
 
   .kpi-deck-info {
     min-width: 0 !important;
+    width: 100% !important;
     flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
     overflow: hidden !important;
   }
 
   .kpi-deck-label {
-    font-size: 0.62rem !important;
+    font-size: 0.64rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    line-height: 1.1 !important;
+    width: 100% !important;
   }
 
   .kpi-deck-val {
-    font-size: 0.82rem !important;
-    font-weight: 700 !important;
+    font-size: clamp(0.85rem, 3.6vw, 1.15rem) !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+    font-variant-numeric: tabular-nums !important;
+    letter-spacing: -0.02em !important;
+    width: 100% !important;
   }
 
   /* 3. Filtros en móvil: Grid ordenado al 100% del ancho */
@@ -7127,28 +7192,22 @@ body.map-tab-active {
     box-sizing: border-box;
   }
 
-  /* 6. Botones de Exportar destacados y táctiles de ancho completo para todos los informes */
-  #panel-informes .card-header-flex {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 12px !important;
-    margin-bottom: 14px !important;
-  }
-
-  #panel-informes .informes-export-actions,
-  #panel-informes .card-header-flex > div:last-child {
+  /* 6. Botones de Exportar destacados y táctiles de ancho completo después de los filtros */
+  .informes-export-bar {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 8px !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    margin-bottom: 16px !important;
   }
 
+  .informes-export-bar button,
   #panel-informes .informes-export-actions button,
   #panel-informes .card-header-flex button.btn {
     justify-content: center !important;
-    padding: 9px 6px !important;
-    font-size: 0.8rem !important;
+    padding: 10px 8px !important;
+    font-size: 0.82rem !important;
     font-weight: 600 !important;
     width: 100% !important;
     box-sizing: border-box !important;
@@ -7158,6 +7217,7 @@ body.map-tab-active {
     display: flex !important;
     align-items: center !important;
     gap: 6px !important;
+  }
   }
 }
 
