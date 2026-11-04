@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Inmobiliaria 5 Tierras — Catálogo Georreferenciado</title>
+
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="5 Tierras Catálogo">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- Leaflet & UI Libs -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #22c55e;
+      --primary-dark: #16a34a;
+      --accent: #6366f1;
+      --success: #22c55e;
+      --warning: #eab308;
+      --danger: #ef4444;
+      --bg: #0a0e1a;
+      --surface: rgba(18, 26, 44, 0.9);
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --border: rgba(255, 255, 255, 0.12);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #map { width: 100%; height: 100%; background: #060b14; z-index: 1; }
+
+    /* ── Top Overlay Header ── */
+    .catalog-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 12px 14px 8px;
+      background: linear-gradient(180deg, rgba(10, 14, 26, 0.92) 0%, rgba(10, 14, 26, 0.65) 70%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .header-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: auto;
+      max-width: 980px;
+      margin: 0 auto 10px;
+    }
+
+    .brand-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      padding: 7px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-pill img {
+      height: 26px;
+      width: auto;
+      border-radius: 6px;
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: #fff;
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+      transition: 0.3s;
+    }
+    .sync-dot.syncing { background: #3b82f6; box-shadow: 0 0 8px rgba(59, 130, 246, 0.7); }
+    .sync-dot.offline { background: #eab308; box-shadow: 0 0 8px rgba(234, 179, 8, 0.7); }
+
+    /* Stats pill */
+    .stats-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      padding: 7px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .stat-badge { display: inline-flex; align-items: center; gap: 5px; }
+    .dot-disp { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+    .dot-res  { width: 8px; height: 8px; border-radius: 50%; background: #eab308; }
+    .dot-vend { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; }
+
+    /* Project Selector Bar */
+    .project-selector-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+      max-width: 980px;
+      margin: 0 auto;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .project-selector-row::-webkit-scrollbar { display: none; }
+
+    .proj-chip {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      backdrop-filter: blur(10px);
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .proj-chip:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+    .proj-chip.active {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #fff;
+      border-color: #4ade80;
+      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+    }
+
+    /* Search Box */
+    .search-wrap {
+      position: relative;
+      margin-left: auto;
+      flex-shrink: 0;
+      width: 170px;
+    }
+    .search-input {
+      width: 100%;
+      height: 35px;
+      background: var(--surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 30px 0 12px;
+      color: #fff;
+      font-size: 0.82rem;
+      font-family: inherit;
+      outline: none;
+    }
+    .search-input:focus { border-color: #22c55e; }
+    .search-btn {
+      position: absolute;
+      right: 4px; top: 3px;
+      width: 28px; height: 28px;
+      border-radius: 9px;
+      border: none;
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      cursor: pointer;
+      font-size: 0.78rem;
+    }
+
+    /* Floating Action Buttons */
+    .fab-container {
+      position: absolute;
+      right: 16px;
+      bottom: 32px;
+      z-index: 900;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .fab {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .fab:active { transform: scale(0.93); }
+    .fab--share {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border-color: rgba(129, 140, 248, 0.5);
+    }
+    .fab--locate.locating {
+      color: #38bdf8;
+      border-color: #38bdf8;
+      animation: pulse 1.4s infinite;
+    }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.45; } 100% { opacity: 1; } }
+
+    /* Lote Labels on Map */
+    .lote-label {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.95), 0 1px 3px #000 !important;
+      pointer-events: none !important;
+      font-size: 11px;
+    }
+    .map-low-zoom .lote-label { display: none !important; }
+
+    /* GPS Marker */
+    .gps-marker { display: flex; align-items: center; justify-content: center; }
+    .gps-marker__dot {
+      width: 14px; height: 14px;
+      background: #3b82f6;
+      border: 2.5px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+      z-index: 2;
+    }
+    .gps-marker__pulse {
+      position: absolute;
+      width: 36px; height: 36px;
+      background: rgba(59, 130, 246, 0.35);
+      border-radius: 50%;
+      animation: gpsPulse 2s infinite;
+      z-index: 1;
+    }
+    @keyframes gpsPulse {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Bottom Sheet (Basic Client Info Only) */
+    .bottomsheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .bottomsheet-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottomsheet {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      z-index: 1200;
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 14, 26, 0.99) 100%);
+      backdrop-filter: blur(20px);
+      border-radius: 26px 26px 0 0;
+      padding: 0 20px 26px;
+      transform: translateX(-50%) translateY(110%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid var(--border);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.65);
+      color: #fff;
+    }
+    .bottomsheet.active {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .bottomsheet__handle {
+      width: 42px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      margin: 10px auto 4px;
+    }
+
+    .bottomsheet__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 12px 0 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 14px;
+    }
+
+    .bottomsheet__title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+    .bottomsheet__subtitle {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    .bs-close-btn {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 13px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+    .status-pill--disponible { background: rgba(34, 197, 94, 0.16); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.35); }
+    .status-pill--reservada  { background: rgba(234, 179, 8, 0.16); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.35); }
+    .status-pill--vendida    { background: rgba(239, 68, 68, 0.16); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .spec-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .spec-box__label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .spec-box__value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .nav-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-dim);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .nav-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .nav-option-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px;
+      border-radius: 13px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: transform 0.15s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    .nav-option-btn:active { transform: scale(0.96); }
+    .nav-option-btn--google { background: #2563eb; }
+    .nav-option-btn--waze   { background: #0284c7; }
+
+    .toast-msg {
+      position: fixed;
+      bottom: 95px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(34, 197, 94, 0.45);
+      color: #4ade80;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 600px) {
+      .stats-pill { padding: 6px 10px; gap: 8px; font-size: 0.72rem; }
+      .brand-title { font-size: 0.85rem; }
+      .search-wrap { width: 130px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header: Brand + Live Stats + Project Selector + Lot Search -->
+  <header class="catalog-header">
+    <div class="header-top-row">
+      <div class="brand-pill">
+        <img src="../04_RECURSOS/logo5t.png" alt="5 Tierras" onerror="this.style.display='none'">
+        <span class="brand-title" id="header-project-title">5 Tierras</span>
+        <div id="sync-indicator" class="sync-dot" title="Sincronizado en tiempo real"></div>
+      </div>
+
+      <div class="stats-pill" title="Disponibilidad en tiempo real">
+        <span class="stat-badge" style="color:#4ade80;"><span class="dot-disp"></span> <span id="stat-disp">--</span> Disp.</span>
+        <span class="stat-badge" style="color:#facc15;"><span class="dot-res"></span> <span id="stat-res">--</span> Res.</span>
+        <span class="stat-badge" style="color:#f87171;"><span class="dot-vend"></span> <span id="stat-vend">--</span> Vend.</span>
+      </div>
+    </div>
+
+    <div class="project-selector-row">
+      <button type="button" class="proj-chip" data-proj="1" onclick="window.Catalogo5T.selectProject(1)">
+        <i class="fa-solid fa-seedling"></i> El Copihue
+      </button>
+      <button type="button" class="proj-chip" data-proj="2" onclick="window.Catalogo5T.selectProject(2)">
+        <i class="fa-solid fa-wind"></i> Las Brisas
+      </button>
+      <button type="button" class="proj-chip" data-proj="3" onclick="window.Catalogo5T.selectProject(3)">
+        <i class="fa-solid fa-tree"></i> Los Encinos
+      </button>
+      <button type="button" class="proj-chip" data-proj="4" onclick="window.Catalogo5T.selectProject(4)">
+        <i class="fa-solid fa-leaf"></i> Los Naranjos
+      </button>
+
+      <div class="search-wrap">
+        <input type="text" id="lote-search-input" class="search-input" placeholder="N° Lote..." onkeydown="if(event.key==='Enter') window.Catalogo5T.searchLote()">
+        <button type="button" class="search-btn" onclick="window.Catalogo5T.searchLote()" title="Buscar Lote">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Floating Buttons: Share & GPS Locate -->
+  <div class="fab-container">
+    <button type="button" id="share-link-btn" class="fab fab--share" title="Compartir este Mapa" onclick="window.Catalogo5T.shareCurrentView()">
+      <i class="fa-solid fa-share-nodes"></i>
+    </button>
+    <button type="button" id="fab-locate" class="fab fab--locate" title="Ver mi ubicación GPS en el terreno" onclick="window.Catalogo5T.locateUser()">
+      <i class="fa-solid fa-location-crosshairs"></i>
+    </button>
+  </div>
+
+  <!-- Satellite Map -->
+  <div id="map"></div>
+
+  <!-- Bottom Sheet (Basic Public Lot Details) -->
+  <div id="bottomsheet-overlay" class="bottomsheet-overlay" onclick="window.Catalogo5T.closeBottomSheet()"></div>
+  <div id="bottomsheet" class="bottomsheet">
+    <div class="bottomsheet__handle"></div>
+    <div class="bottomsheet__header">
+      <div>
+        <div id="bs-lote-id" class="bottomsheet__title">Lote --</div>
+        <div id="bs-project-name" class="bottomsheet__subtitle">Proyecto --</div>
+      </div>
+      <button type="button" class="bs-close-btn" onclick="window.Catalogo5T.closeBottomSheet()" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div id="bs-current-status" class="status-pill status-pill--disponible">● Disponible</div>
+
+    <div class="specs-grid">
+      <div class="spec-box">
+        <div class="spec-box__label"><i class="fa-solid fa-vector-square"></i> Superficie</div>
+        <div id="bs-lote-area" class="spec-box__value">-- m²</div>
+      </div>
+      <div class="spec-box">
+        <div class="spec-box__label"><i class="fa-solid fa-tag"></i> Precio</div>
+        <div id="bs-price-value" class="spec-box__value">$ --</div>
+      </div>
+    </div>
+
+    <div class="nav-label"><i class="fa-solid fa-location-dot"></i> Navegación GPS directa a la parcela</div>
+    <div class="nav-options">
+      <a id="btn-nav-google" href="#" target="_blank" rel="noopener" class="nav-option-btn nav-option-btn--google">
+        <i class="fa-solid fa-map-location-dot"></i> Google Maps
+      </a>
+      <a id="btn-nav-waze" href="#" target="_blank" rel="noopener" class="nav-option-btn nav-option-btn--waze">
+        <i class="fa-brands fa-waze"></i> Waze
+      </a>
+    </div>
+  </div>
+
+  <div id="toast-msg" class="toast-msg">Enlace copiado al portapapeles</div>
+
+  <!-- Leaflet & Master GeoJSON Layers -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../03_CORAZON/layers/copihue_master.js?v=20261104"></script>
+  <script src="../03_CORAZON/layers/brisas_master.js?v=20261104"></script>
+  <script src="../03_CORAZON/layers/encinos_master.js?v=20261104"></script>
+  <script src="../03_CORAZON/layers/naranjos_master.js?v=20261104"></script>
+  <script src="js/catalogo_clientes.js?v=20261104_1115"></script>
+</body>
+</html>
+

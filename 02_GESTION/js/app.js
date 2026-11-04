@@ -744,15 +744,19 @@ const APP5T = (() => {
       }
     }
 
-    // Switch to first tab of the new role that is permitted
-    let visibleMenus = (MENUS[role] || []).filter(m => !m.isSection && _isTabVisible(role, m.id, m));
-    if (visibleMenus.length > 0) {
-      let firstMenu = visibleMenus[0];
-      let firstTabId = firstMenu.id;
-      if (firstMenu.isGroup && firstMenu.children && firstMenu.children.length > 0) {
-        firstTabId = firstMenu.children[0].id;
+    // Iniciar siempre en el Mapa GIS por defecto para los 3 perfiles (si tiene permiso de mapa)
+    if (_isTabVisible(role, 'mapa')) {
+      switchTab(_lastActiveProject ? ('mapa-' + _lastActiveProject) : 'mapa-todos');
+    } else {
+      let visibleMenus = (MENUS[role] || []).filter(m => !m.isSection && _isTabVisible(role, m.id, m));
+      if (visibleMenus.length > 0) {
+        let firstMenu = visibleMenus[0];
+        let firstTabId = firstMenu.id;
+        if (firstMenu.isGroup && firstMenu.children && firstMenu.children.length > 0) {
+          firstTabId = firstMenu.children[0].id;
+        }
+        switchTab(firstTabId);
       }
-      switchTab(firstTabId);
     }
 
     // Refresh currently selected lote panel if one is active on map and we are on the map tab
@@ -1180,6 +1184,14 @@ const APP5T = (() => {
         }
       } catch(e) {}
 
+      if (canSeeMap) {
+        html += `
+          <a href="#" class="mobile-nav-item${activeTab.startsWith('mapa') ? ' active' : ''}" data-tab="mapa">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>Mapa</span>
+          </a>
+        `;
+      }
       html += `
         <a href="#" class="mobile-nav-item${activeTab === 'aprobaciones' ? ' active' : ''}" data-tab="aprobaciones" style="position:relative;">
           <i class="fa-solid fa-stamp" style="${activeTab === 'aprobaciones' ? 'color:#f59e0b;' : ''}"></i>
@@ -1195,14 +1207,6 @@ const APP5T = (() => {
           </a>
         `;
       }
-      if (canSeeMap) {
-        html += `
-          <a href="#" class="mobile-nav-item${activeTab.startsWith('mapa') ? ' active' : ''}" data-tab="mapa">
-            <i class="fa-solid fa-map-location-dot"></i>
-            <span>Mapa</span>
-          </a>
-        `;
-      }
       html += `
         <a href="#" class="mobile-nav-item${activeTab === 'inventario' ? ' active' : ''}" data-tab="inventario">
           <i class="fa-solid fa-list-check"></i>
@@ -1210,7 +1214,7 @@ const APP5T = (() => {
         </a>
       `;
     } else if (role === 'administrador') {
-      // Prioridad 1: Mesa Documental
+      // Prioridad 1: Mapa + Mesa Documental con contador
       let mesaBadge = '';
       try {
         const props = (typeof APP5T_DB !== 'undefined' && APP5T_DB.getAll) ? (APP5T_DB.getAll('propiedades') || []) : [];
@@ -1223,6 +1227,14 @@ const APP5T = (() => {
         }
       } catch(e) {}
 
+      if (canSeeMap) {
+        html += `
+          <a href="#" class="mobile-nav-item${activeTab.startsWith('mapa') ? ' active' : ''}" data-tab="mapa">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>Mapa</span>
+          </a>
+        `;
+      }
       html += `
         <a href="#" class="mobile-nav-item${activeTab === 'mesa' ? ' active' : ''}" data-tab="mesa" style="position:relative;">
           <i class="fa-solid fa-file-contract"></i>
@@ -1239,14 +1251,6 @@ const APP5T = (() => {
           <a href="#" class="mobile-nav-item${activeTab === 'dashboard' ? ' active' : ''}" data-tab="dashboard">
             <i class="fa-solid fa-chart-line"></i>
             <span>Dashboard</span>
-          </a>
-        `;
-      }
-      if (canSeeMap) {
-        html += `
-          <a href="#" class="mobile-nav-item${activeTab.startsWith('mapa') ? ' active' : ''}" data-tab="mapa">
-            <i class="fa-solid fa-map-location-dot"></i>
-            <span>Mapa</span>
           </a>
         `;
       }
@@ -1410,7 +1414,10 @@ const APP5T = (() => {
     if (priceEl) priceEl.textContent = APP5T_Utils.formatMoneda(propiedadData.valor_final || 0);
     if (badgeEl) badgeEl.innerHTML = getStatusBadgeHTML(propiedadData.estado);
 
-
+    const shareBarEl = document.getElementById('lote-client-share-bar');
+    if (shareBarEl) {
+      shareBarEl.innerHTML = _buildClientShareBarHTML(propiedadData);
+    }
 
     // Render the action form / complete operation card
     const formContainer = document.getElementById('lote-action-form');
@@ -1426,6 +1433,107 @@ const APP5T = (() => {
   }
 
   
+  /* ══════════════════════════════════════════════════════
+     CATÁLOGO GEORREFERENCIADO PARA CLIENTES (VITRINA)
+     ══════════════════════════════════════════════════════ */
+  const _CATALOGO_PROYECTOS = {
+    1: { id: 1, slug: 'copihue',  nombre: 'Hacienda El Copihue', icono: 'fa-solid fa-seedling', color: '#10b981' },
+    2: { id: 2, slug: 'brisas',   nombre: 'Fundo Las Brisas',    icono: 'fa-solid fa-wind',     color: '#38bdf8' },
+    3: { id: 3, slug: 'encinos',  nombre: 'Hacienda Los Encinos',icono: 'fa-solid fa-tree',     color: '#a855f7' },
+    4: { id: 4, slug: 'naranjos', nombre: 'Fundo Los Naranjos',  icono: 'fa-solid fa-leaf',     color: '#f59e0b' }
+  };
+
+  function _getCatalogoBaseUrl() {
+    try {
+      const url = new URL('catalogo.html', window.location.href);
+      return url.origin + url.pathname;
+    } catch (e) {
+      return 'catalogo.html';
+    }
+  }
+
+  function _buildClientShareBarHTML(propiedadData) {
+    if (!propiedadData) return '';
+    return `
+      <button type="button" id="btn-copy-lote-link-${propiedadData.id}" onclick="window.APP5T.shareLoteCatalogo('${propiedadData.id}', 'copy', this)" title="Copiar enlace georreferenciado de este lote para enviarlo al cliente" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(168, 85, 247, 0.45); background: rgba(168, 85, 247, 0.14); color: #d8b4fe; font-size: 0.78rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; transition: all 0.2s;">
+        <i class="fa-solid fa-link"></i> <span>Copiar Link del Lote (Catálogo Cliente)</span>
+      </button>
+    `;
+  }
+
+  function _copyTextToClipboard(text, toastMsg, btnEl) {
+    const onCopied = () => {
+      if (typeof APP5T_Utils !== 'undefined' && APP5T_Utils.showToast) {
+        APP5T_Utils.showToast(toastMsg || 'Enlace copiado al portapapeles', 'success');
+      }
+      if (btnEl) {
+        const origHtml = btnEl.getAttribute('data-orig-html') || btnEl.innerHTML;
+        if (!btnEl.getAttribute('data-orig-html')) btnEl.setAttribute('data-orig-html', origHtml);
+        btnEl.innerHTML = '<i class="fa-solid fa-check"></i> <span>¡Link Copiado!</span>';
+        btnEl.style.borderColor = '#22c55e';
+        btnEl.style.color = '#4ade80';
+        setTimeout(() => {
+          btnEl.innerHTML = origHtml;
+          btnEl.style.borderColor = '';
+          btnEl.style.color = '';
+        }, 2000);
+      }
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(onCopied).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        onCopied();
+      });
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      onCopied();
+    }
+  }
+
+  function shareProyectoCatalogo(projId, mode) {
+    const pInfo = _CATALOGO_PROYECTOS[Number(projId)] || _CATALOGO_PROYECTOS[1];
+    const link = `${_getCatalogoBaseUrl()}?proyecto=${pInfo.slug}`;
+    _copyTextToClipboard(link, `Link de ${pInfo.nombre} copiado al portapapeles`);
+  }
+
+  function shareLoteCatalogo(propId, mode, btnEl) {
+    const prop = typeof APP5T_DB !== 'undefined' ? APP5T_DB.getById('propiedades', propId) : null;
+    if (!prop) return;
+    const pInfo = _CATALOGO_PROYECTOS[Number(prop.id_proyecto)] || _CATALOGO_PROYECTOS[1];
+    const loteNum = String(prop.nombre || prop.id).replace(/^Lote\s*/i, '').trim();
+    const link = `${_getCatalogoBaseUrl()}?proyecto=${pInfo.slug}&lote=${encodeURIComponent(loteNum)}`;
+    _copyTextToClipboard(link, `Link del Lote ${loteNum} (${pInfo.nombre}) copiado`, btnEl);
+  }
+
+  function openCatalogoClientesModal() {
+    const btn = document.getElementById('btn-catalogo-clientes');
+    const select = document.getElementById('map-project-select');
+    const val = select ? String(select.value || '').toLowerCase() : 'todos';
+
+    let projSlug = null;
+    let projLabel = 'Catálogo General (4 Proyectos)';
+    if (val && val !== 'todos' && val !== 'all') {
+      if (val === '1' || val.includes('copihue')) { projSlug = 'copihue'; projLabel = 'Hacienda El Copihue'; }
+      else if (val === '2' || val.includes('brisa')) { projSlug = 'brisas'; projLabel = 'Fundo Las Brisas'; }
+      else if (val === '3' || val.includes('encino') || val.includes('encina')) { projSlug = 'encinos'; projLabel = 'Hacienda Los Encinos'; }
+      else if (val === '4' || val.includes('naranjo')) { projSlug = 'naranjos'; projLabel = 'Fundo Los Naranjos'; }
+    }
+
+    const link = projSlug ? `${_getCatalogoBaseUrl()}?proyecto=${projSlug}` : _getCatalogoBaseUrl();
+    _copyTextToClipboard(link, `Link de ${projLabel} copiado para enviar`, btn);
+  }
+
   function openLoteHistorial(idLote) {
     try {
       const propiedad = typeof APP5T_DB !== 'undefined' ? APP5T_DB.getById('propiedades', idLote) : null;
@@ -1686,6 +1794,7 @@ const APP5T = (() => {
               <strong class="spec-value" style="color:var(--text-white);">${formattedPrice}</strong>
             </div>
           </div>
+          <div style="margin-bottom: 14px;">${_buildClientShareBarHTML(propiedadData)}</div>
           <div id="bs-lote-action-form"></div>
         </div>
       `;
@@ -1835,15 +1944,18 @@ const APP5T = (() => {
   function _isNeg100Paid(neg) {
     if (!neg || !neg.id_propiedad) return false;
     const ctas = typeof APP5T_DB !== 'undefined' ? (APP5T_DB.getAll('cuenta_corriente') || []) : [];
-    const cuotasProp = ctas.filter(q => Number(q.id_propiedad) === Number(neg.id_propiedad));
+    const cuotasProp = ctas.filter(q => {
+      if (Number(q.id_propiedad) !== Number(neg.id_propiedad)) return false;
+      const est = String(q.estado_cuota || '').trim().toLowerCase();
+      if (est.includes('anulad') || est.includes('reprogramad')) return false;
+      return Number(q.valor_cuota || 0) > 0;
+    });
     if (cuotasProp.length === 0) return false;
     const pendientes = cuotasProp.filter(q => {
       const pagado = Number(q.valor_pagado || 0);
       const cuota  = Number(q.valor_cuota  || 0);
-      if (cuota <= 0) return false;
       if (q.estado_cuota) {
         const est = String(q.estado_cuota).trim().toLowerCase();
-        if (est.includes('anulad') || est.includes('reprogramad')) return false;
         return est !== 'pagado' && est !== 'pagada' && est !== 'paid';
       }
       return pagado < cuota;
@@ -1859,7 +1971,9 @@ const APP5T = (() => {
       if (stAvance.includes('anulad') || stAvance.includes('rescind') || stAvance.includes('cancelad') || stAvance.includes('rechazad')) return false;
       
       const p = APP5T_DB.getById('propiedades', n.id_propiedad);
-      if (!p || p.estado === 'Disponible' || p.estado === 'Vendida' || p.estado === 'Escriturada') return false;
+      if (!p || p.estado === 'Disponible' || p.estado === 'Pendiente' || p.estado === 'Vendida' || p.estado === 'Escriturada') return false;
+      const isDirecta = (n.tipo_operacion === 'Venta_Directa' || n.id_proceso === 'Venta_Directa');
+      if (p.estado === 'Reservada' && !isDirecta) return false;
       if (n.estado_escrituracion === 'Autorizada' || (n.notas || '').indexOf('[AUTORIZADO_ESCRITURAR:TRUE]') !== -1) return false;
       
       return (n.estado_escrituracion === 'Pendiente' || (n.notas || '').includes('[AUTORIZADO_ESCRITURAR') || _isNeg100Paid(n));
@@ -1890,10 +2004,13 @@ const APP5T = (() => {
     if (!listContainer) return;
 
     const propiedades = APP5T_DB.getAll('propiedades') || [];
-    const countTab1 = propiedades.filter(p => String(p.estado || '').toLowerCase() === 'pendiente').length;
+    const countTab1 = propiedades.filter(p => {
+      const st = String(p.estado || '').toLowerCase();
+      return st === 'pendiente' || st === 'reservada' || st === 'reservado';
+    }).length;
     const countTab2 = propiedades.filter(p => {
       const st = String(p.estado || '').toLowerCase();
-      return st === 'reservada' || st === 'reservado';
+      return st === 'promesada' || st === 'promesado';
     }).length;
     const countTab3 = _getTab3ActiveNegs().length;
 
@@ -1959,14 +2076,14 @@ const APP5T = (() => {
       + _buildAcordeon(3, 'fa-solid fa-gavel', '3. Cierre Final', countTab3, rows3.html, hasMatches3);
   }
 
-  /* ── PESTAÑA 1: Solicitudes de Reserva / Venta por Aprobar ── */
+  /* ── PESTAÑA 1: Reservas (Pendientes de Aprobación + Reservas Aprobadas por Firmar Promesa) ── */
   function _getMesaTab1Rows() {
     let rows = [];
     (APP5T_DB.getAll('propiedades') || []).forEach(p => {
       const st = String(p.estado || '').toLowerCase();
-      if (st === 'pendiente') {
-        const negs = APP5T_DB.query('negociaciones', n => n && String(n.id_propiedad) === String(p.id)) || [];
-        const neg  = negs.find(n => n.estado_avance === 'Solicitada' || n.estado_avance === 'En Curso' || n.estado_avance === 'Pendiente') || negs[negs.length - 1];
+      if (st === 'pendiente' || st === 'reservada' || st === 'reservado') {
+        const negs = (APP5T_DB.query('negociaciones', n => n && String(n.id_propiedad) === String(p.id) && n.estado_avance !== 'Cancelado') || []).sort((a, b) => Number(b.id) - Number(a.id));
+        const neg  = negs.find(n => n.estado_avance === 'Solicitada' || n.estado_avance === 'Aprobado' || n.estado_avance === 'En Curso' || n.estado_avance === 'Pendiente') || negs[0];
         rows.push({ p, neg });
       }
     });
@@ -1985,7 +2102,7 @@ const APP5T = (() => {
       });
     }
 
-    const emptyMsg = apQuery ? 'No se encontraron solicitudes para la búsqueda' : 'Sin solicitudes de reserva pendientes por aprobar';
+    const emptyMsg = apQuery ? 'No se encontraron reservas para la búsqueda' : 'Sin reservas activas ni pendientes por aprobar';
     if (rows.length === 0) {
       return {
         html: `<tr><td colspan="7" class="text-center text-muted" style="padding: 24px; text-align: center; color: var(--text-dim);"><i class="fa-solid fa-inbox" style="font-size:1.3rem;opacity:0.4;display:block;margin-bottom:8px;"></i>${emptyMsg}</td></tr>`,
@@ -1994,6 +2111,8 @@ const APP5T = (() => {
     }
 
     const html = rows.map(({ p, neg }) => {
+      const st     = String(p.estado || '').toLowerCase();
+      const isPend = (st === 'pendiente');
       const cli    = neg ? APP5T_DB.getById('clientes',  neg.id_cliente)   : null;
       const proy   = p.id_proyecto ? APP5T_DB.getById('proyectos', p.id_proyecto)   : null;
       const fecha  = neg ? (neg.fecha_negociacion || neg.fecha_ingreso || p.fecha_reserva || APP5T_Utils.fechaHoy()) : (p.fecha_reserva || APP5T_Utils.fechaHoy());
@@ -2002,24 +2121,51 @@ const APP5T = (() => {
       const loteProy  = `<strong style="color: var(--accent-green); font-size: 1.02em;">${lote} / ${proyNom}</strong>`;
       const cliName   = cli  ? `${cli.nombres||''} ${cli.apellidos||''}`.trim() : 'Cliente';
       const rut       = cli  ? (cli.rut || '-') : '-';
-      const monto     = APP5T_Utils.formatMoneda((neg ? (neg.pie || neg.valor_final || p.valor_final || 0) : (p.valor_final || 0)));
+      const monto     = APP5T_Utils.formatMoneda((neg ? (neg.valor_final || neg.pie || p.valor_final || 0) : (p.valor_final || 0)));
 
       const isSaldoPrecio = neg && (neg.tipo_operacion === 'Saldo_Precio' || neg.id_proceso === 'Saldo_Precio');
       const isVentaDirecta = neg && (neg.tipo_operacion === 'Venta_Directa' || neg.id_proceso === 'Venta_Directa');
       
       let tipoBadge = '<span class="tag tag-escritura" style="font-size:0.72rem; background: rgba(52, 152, 219, 0.15); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.25);"><i class="fa-solid fa-file-contract"></i> Promesa en Cuotas</span>';
-      let b1 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._aprobarReservaDirecta('${p.id}',event)" title="Aprobar Reserva Directa" style="padding: 6px 14px; background: rgba(22, 163, 74, 0.2); border: 1px solid #16a34a; color: #4ade80; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-check"></i> 1. Aprobar Reserva</button>`;
-
       if (isSaldoPrecio) {
         tipoBadge = '<span class="tag" style="font-size:0.72rem; background: rgba(147, 51, 234, 0.15); color: #7e22ce; border: 1px solid rgba(147, 51, 234, 0.3); font-weight:700;"><i class="fa-solid fa-landmark"></i> Saldo de Precio</span>';
-        b1 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._aprobarReservaDirecta('${p.id}',event)" title="Aprobar Saldo de Precio" style="padding: 6px 14px; background: rgba(124, 58, 237, 0.2); border: 1px solid #7c3aed; color: #c084fc; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-landmark"></i> 1. Aprobar Saldo Precio</button>`;
       } else if (isVentaDirecta) {
         tipoBadge = '<span class="tag tag-venta-directa" style="font-size:0.72rem; background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); font-weight:700;"><i class="fa-solid fa-bolt"></i> Venta Directa</span>';
-        b1 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._aprobarReservaDirecta('${p.id}',event)" title="Aprobar Venta Contado" style="padding: 6px 14px; background: rgba(217, 119, 6, 0.2); border: 1px solid #d97706; color: #fbbf24; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-bolt"></i> 1. Aprobar Venta Contado</button>`;
       }
 
       const cantCtasInfo = (neg && neg.cantidad_cuotas && Number(neg.cantidad_cuotas) > 0) ? `<div style="font-size:0.72rem; color:var(--text-dim);">${neg.cantidad_cuotas} cuotas</div>` : '';
-      const docsBadge = `<span class="tag" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.72rem; font-weight:600;">1. Pendiente</span>`;
+
+      let docsBadge = '';
+      let actionButtons = '';
+
+      if (isPend) {
+        docsBadge = `<span class="tag" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.72rem; font-weight:600;">1. Pend. Aprobación</span>`;
+        let b1 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._aprobarReservaDirecta('${p.id}',event)" title="Aprobar Reserva Directa" style="padding: 6px 14px; background: rgba(22, 163, 74, 0.2); border: 1px solid #16a34a; color: #4ade80; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-check"></i> 1. Aprobar Reserva</button>`;
+        if (isSaldoPrecio) {
+          b1 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._aprobarReservaDirecta('${p.id}',event)" title="Aprobar Saldo de Precio" style="padding: 6px 14px; background: rgba(124, 58, 237, 0.2); border: 1px solid #7c3aed; color: #c084fc; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-landmark"></i> 1. Aprobar Saldo Precio</button>`;
+        } else if (isVentaDirecta) {
+          b1 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._aprobarReservaDirecta('${p.id}',event)" title="Aprobar Venta Contado" style="padding: 6px 14px; background: rgba(217, 119, 6, 0.2); border: 1px solid #d97706; color: #fbbf24; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-bolt"></i> 1. Aprobar Venta Contado</button>`;
+        }
+        actionButtons = b1;
+      } else {
+        const isFichaGen = !!p.ficha_abogado_generada || (neg && (!!neg.ficha_abogado_generada || (neg.notas || '').includes('[FICHA_ABOGADO:GENERADA]')));
+        const isAutorizadoPromesa = !!p.autorizado_promesa || (neg && (!!neg.autorizado_promesa || (neg.notas || '').includes('[AUTORIZADO_PROMESA:TRUE]')));
+        let b2 = '', b3 = '';
+        if (!isFichaGen) {
+          docsBadge = `<span class="tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.72rem; font-weight:600;">2. Reserva Aprobada · Pend. Ficha</span>`;
+          b2 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._enviarFichaAbogado('${p.id}', 'promesa')" title="Descargar Ficha Legal para Abogado" style="padding: 6px 12px; background: rgba(37, 99, 235, 0.2); border: 1px solid #2563eb; color: #60a5fa; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-file-pdf"></i> Ficha Legal</button>`;
+          b3 = `<button class="btn btn-sm btn-outline btn-action-main" disabled title="Descargue primero la Ficha Legal" style="padding: 6px 10px; opacity: 0.5; cursor: not-allowed; background: rgba(255,255,255,0.02);"><i class="fa-solid fa-lock"></i> Pend. Ficha</button>`;
+        } else if (isFichaGen && !isAutorizadoPromesa) {
+          docsBadge = `<span class="tag" style="background: rgba(59, 130, 246, 0.15); color: #3498db; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.72rem; font-weight:600;">3. Ficha Emitida</span>`;
+          b2 = `<button class="btn btn-sm btn-outline btn-action-main" onclick="window.APP5T._enviarFichaAbogado('${p.id}', 'promesa')" title="Re-descargar Ficha Legal" style="padding: 6px 10px; border-color: rgba(59, 130, 246, 0.4); color: #60a5fa; font-weight:600;"><i class="fa-solid fa-file-circle-check"></i> Ficha ✓</button>`;
+          b3 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._autorizarFirmaPromesaDirecta('${p.id}', event)" title="Autorizar Firma de Promesa en Administración" style="padding: 6px 12px; background: rgba(124, 58, 237, 0.2); border: 1px solid #7c3aed; color: #c084fc; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-file-signature"></i> Autorizar Firma</button>`;
+        } else {
+          docsBadge = `<span class="tag" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 0.72rem; font-weight:600;">4. Firma Autorizada ✓</span>`;
+          b2 = `<button class="btn btn-sm btn-outline btn-action-main" onclick="window.APP5T._enviarFichaAbogado('${p.id}', 'promesa')" title="Re-descargar Ficha Legal" style="padding: 6px 8px; border-color: rgba(59, 130, 246, 0.4); color: #60a5fa; font-weight:600;"><i class="fa-solid fa-file-circle-check"></i> Ficha ✓</button>`;
+          b3 = `<button class="btn btn-sm btn-action-main" onclick="APP5T_Utils.showToast('Firma de Promesa autorizada por Gerencia. Proceso habilitado en Administración.', 'info')" title="Firma ya autorizada" style="padding: 6px 8px; background: rgba(22, 163, 74, 0.2); border: 1px solid #16a34a; color: #4ade80; font-weight:700; border-radius: 6px;"><i class="fa-solid fa-check-double"></i> Autorizada ✓</button>`;
+        }
+        actionButtons = `${b2} ${b3}`;
+      }
 
       return `<tr>
         <td data-label="Fecha">${fecha}</td>
@@ -2030,7 +2176,7 @@ const APP5T = (() => {
         <td data-label="Documentos">${docsBadge}</td>
         <td data-label="Acción" style="text-align:right; white-space:nowrap;">
           <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
-            ${b1}
+            ${actionButtons}
             <button class="btn btn-sm btn-outline btn-icon-only" onclick="window.APP5T.openLoteHistorial('${p.id}')" title="Ver Historial del Lote" style="padding: 6px 10px; color: #60a5fa; border-color: rgba(96, 165, 250, 0.3);">
               <i class="fa-solid fa-clock-rotate-left"></i>
             </button>
@@ -2045,14 +2191,15 @@ const APP5T = (() => {
     return { html, hasMatches: true };
   }
 
-  /* ── PESTAÑA 2: Ficha Abogado y Firma Promesa ── */
+  /* ── PESTAÑA 2: Promesas en Curso (Todos los Lotes Promesados en el Mapa) ── */
   function _getMesaTab2Rows() {
     let rows = [];
+    const todasCtaCte = typeof APP5T_DB !== 'undefined' ? (APP5T_DB.getAll('cuenta_corriente') || []) : [];
     (APP5T_DB.getAll('propiedades') || []).forEach(p => {
       const st = String(p.estado || '').toLowerCase();
-      if (st === 'reservada' || st === 'reservado') {
-        const negs = APP5T_DB.query('negociaciones', n => n && String(n.id_propiedad) === String(p.id)) || [];
-        const neg  = negs.find(n => n.estado_avance === 'Aprobado') || negs[negs.length - 1];
+      if (st === 'promesada' || st === 'promesado') {
+        const negs = (APP5T_DB.query('negociaciones', n => n && String(n.id_propiedad) === String(p.id) && n.estado_avance !== 'Cancelado') || []).sort((a, b) => Number(b.id) - Number(a.id));
+        const neg  = negs.find(n => n.id_proceso === 'Promesa' || n.tipo_operacion === 'Promesa' || n.estado_avance === 'En Curso' || n.estado_avance === 'Aprobado') || negs[0];
         rows.push({ p, neg });
       }
     });
@@ -2071,7 +2218,7 @@ const APP5T = (() => {
       });
     }
 
-    const emptyMsg = apQuery ? 'No se encontraron reservas para la búsqueda' : 'Sin reservas aprobadas en etapa de Promesa';
+    const emptyMsg = apQuery ? 'No se encontraron promesas para la búsqueda' : 'Sin promesas activas en curso';
     if (rows.length === 0) {
       return {
         html: `<tr><td colspan="7" class="text-center text-muted" style="padding: 24px; text-align: center; color: var(--text-dim);"><i class="fa-solid fa-inbox" style="font-size:1.3rem;opacity:0.4;display:block;margin-bottom:8px;"></i>${emptyMsg}</td></tr>`,
@@ -2082,7 +2229,7 @@ const APP5T = (() => {
     const html = rows.map(({ p, neg }) => {
       const cli    = neg ? APP5T_DB.getById('clientes', neg.id_cliente) : null;
       const proy   = p.id_proyecto ? APP5T_DB.getById('proyectos', p.id_proyecto) : null;
-      const fecha  = p.fecha_reserva || (neg ? (neg.fecha_negociacion || neg.fecha_ingreso) : '-') || APP5T_Utils.fechaHoy();
+      const fecha  = (neg ? (neg.fecha_promesa || neg.fecha_negociacion || neg.fecha_ingreso) : null) || p.fecha_fin_promesa || p.fecha_reserva || '-';
       const lote   = p.nombre || `Lote ${p.id}`;
       const proyNom= proy ? (proy.nombre_proyecto || proy.nombre || '-') : '-';
       const loteProy = `<strong style="color: var(--accent-green); font-size: 1.02em;">${lote} / ${proyNom}</strong>`;
@@ -2090,34 +2237,34 @@ const APP5T = (() => {
       const rut    = cli ? (cli.rut || '-') : '-';
       const monto  = APP5T_Utils.formatMoneda((neg ? (neg.valor_final || p.valor_final || 0) : (p.valor_final || 0)));
 
-      const isSaldoPrecio = neg && (neg.tipo_operacion === 'Saldo_Precio' || neg.id_proceso === 'Saldo_Precio');
-      const isVentaDirecta = neg && (neg.tipo_operacion === 'Venta_Directa' || neg.id_proceso === 'Venta_Directa');
-      let tipoBadge = '<span class="tag tag-escritura" style="font-size:0.72rem; background: rgba(52, 152, 219, 0.15); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.25);"><i class="fa-solid fa-file-contract"></i> Promesa en Cuotas</span>';
-      if (isSaldoPrecio) {
-        tipoBadge = '<span class="tag" style="font-size:0.72rem; background: rgba(147, 51, 234, 0.15); color: #7e22ce; border: 1px solid rgba(147, 51, 234, 0.3); font-weight:700;"><i class="fa-solid fa-landmark"></i> Saldo de Precio</span>';
-      } else if (isVentaDirecta) {
-        tipoBadge = '<span class="tag tag-venta-directa" style="font-size:0.72rem; background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); font-weight:700;"><i class="fa-solid fa-bolt"></i> Venta Directa</span>';
-      }
+      const cuotasActivas = todasCtaCte.filter(q => {
+        if (Number(q.id_propiedad) !== Number(p.id)) return false;
+        const est = String(q.estado_cuota || '').trim().toLowerCase();
+        if (est.includes('anulad') || est.includes('reprogramad')) return false;
+        return Number(q.valor_cuota || 0) > 0;
+      });
+      const cuotasPagadas = cuotasActivas.filter(q => {
+        const est = String(q.estado_cuota || '').trim().toLowerCase();
+        return est === 'pagado' || est === 'pagada' || est === 'paid' || Number(q.valor_pagado || 0) >= Number(q.valor_cuota || 0);
+      });
+      const totalCtas = cuotasActivas.length || Number(neg && neg.cantidad_cuotas ? neg.cantidad_cuotas : 0);
+      const pagadasCnt = cuotasPagadas.length;
+      const pendCnt = Math.max(0, totalCtas - pagadasCnt);
 
-      const isFichaGen = !!p.ficha_abogado_generada || (neg && (!!neg.ficha_abogado_generada || (neg.notas || '').includes('[FICHA_ABOGADO:GENERADA]')));
-      const isAutorizadoPromesa = !!p.autorizado_promesa || (neg && (!!neg.autorizado_promesa || (neg.notas || '').includes('[AUTORIZADO_PROMESA:TRUE]')));
-      const isPromesaFirmada = String(p.estado || '').toLowerCase().includes('promesa') || (neg && !!neg.promesa_firmada);
+      const tipoBadge = `<span class="tag tag-escritura" style="font-size:0.72rem; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-weight:700;"><i class="fa-solid fa-file-signature"></i> Promesa Firmada (${totalCtas || '-'} cuotas)</span>`;
 
-      let docsBadge = '', b2 = '', b3 = '';
-
-      if (!isFichaGen) {
-        docsBadge = `<span class="tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.72rem; font-weight:600;">2. Pend. Ficha Legal</span>`;
-        b2 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._enviarFichaAbogado('${p.id}', 'promesa')" title="Descargar Ficha Legal para Abogado" style="padding: 6px 14px; background: rgba(37, 99, 235, 0.2); border: 1px solid #2563eb; color: #60a5fa; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-file-pdf"></i> Ficha Legal</button>`;
-        b3 = `<button class="btn btn-sm btn-outline btn-action-main" disabled title="Descargue primero la Ficha Legal" style="padding: 6px 10px; opacity: 0.5; cursor: not-allowed; background: rgba(255,255,255,0.02);"><i class="fa-solid fa-lock"></i> Pend. Ficha</button>`;
-      } else if (isFichaGen && !isAutorizadoPromesa && !isPromesaFirmada) {
-        docsBadge = `<span class="tag" style="background: rgba(59, 130, 246, 0.15); color: #3498db; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.72rem; font-weight:600;">3. Ficha Emitida</span>`;
-        b2 = `<button class="btn btn-sm btn-outline btn-action-main" onclick="window.APP5T._enviarFichaAbogado('${p.id}', 'promesa')" title="Re-descargar Ficha Legal" style="padding: 6px 12px; border-color: rgba(59, 130, 246, 0.4); color: #60a5fa; font-weight:600;"><i class="fa-solid fa-file-circle-check"></i> Ficha ✓</button>`;
-        b3 = `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._autorizarFirmaPromesaDirecta('${p.id}', event)" title="Autorizar Firma de Promesa en Administración" style="padding: 6px 14px; background: rgba(124, 58, 237, 0.2); border: 1px solid #7c3aed; color: #c084fc; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-file-signature"></i> Autorizar Firma</button>`;
+      let docsBadge = '';
+      if (totalCtas > 0 && pendCnt === 0) {
+        docsBadge = `<span class="tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.72rem; font-weight:700;">100% Pagado (${pagadasCnt}/${totalCtas})</span>`;
       } else {
-        docsBadge = `<span class="tag" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 0.72rem; font-weight:600;">4. Autorizada ✓</span>`;
-        b2 = `<button class="btn btn-sm btn-outline btn-action-main" onclick="window.APP5T._enviarFichaAbogado('${p.id}', 'promesa')" title="Re-descargar Ficha Legal" style="padding: 6px 8px; border-color: rgba(59, 130, 246, 0.4); color: #60a5fa; font-weight:600;"><i class="fa-solid fa-file-circle-check"></i> Ficha ✓</button>`;
-        b3 = `<button class="btn btn-sm btn-action-main" onclick="APP5T_Utils.showToast('Firma de Promesa autorizada por Gerencia. Proceso habilitado en Administración.', 'info')" title="Firma ya autorizada" style="padding: 6px 8px; background: rgba(22, 163, 74, 0.2); border: 1px solid #16a34a; color: #4ade80; font-weight:700; border-radius: 6px;"><i class="fa-solid fa-check-double"></i> Autorizada ✓</button>`;
+        docsBadge = `<span class="tag" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.72rem; font-weight:600;"><i class="fa-solid fa-coins"></i> ${pagadasCnt} / ${totalCtas} pagadas (${pendCnt} pend.)</span>`;
       }
+
+      const btnCtaCte = `<button class="btn btn-sm btn-outline btn-action-main" onclick="window.APP5T.goToCuentaCorriente('${p.id}')" title="Ver Cuenta Corriente del Lote" style="padding: 6px 10px; border-color: rgba(0, 229, 255, 0.35); color: #00e5ff; font-weight:600;"><i class="fa-solid fa-file-invoice-dollar"></i> Cta. Cte.</button>`;
+      const btnFicha  = `<button class="btn btn-sm btn-outline btn-action-main" onclick="window.APP5T._enviarFichaAbogado('${p.id}', 'promesa')" title="Descargar Ficha Legal de Promesa" style="padding: 6px 10px; border-color: rgba(59, 130, 246, 0.4); color: #60a5fa; font-weight:600;"><i class="fa-solid fa-file-pdf"></i> Ficha</button>`;
+      const btnCierre = (totalCtas > 0 && pendCnt === 0)
+        ? `<button class="btn btn-sm btn-action-main" onclick="window.APP5T._validarPagoPromesa('${neg ? neg.id : p.id}')" title="Enviar a 3. Cierre Final y Escrituración" style="padding: 6px 10px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; font-weight:700; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-gavel"></i> Pasar a Cierre</button>`
+        : '';
 
       return `<tr>
         <td data-label="Fecha">${fecha}</td>
@@ -2128,13 +2275,11 @@ const APP5T = (() => {
         <td data-label="Documentos">${docsBadge}</td>
         <td data-label="Acción" style="text-align:right; white-space:nowrap;">
           <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
-            ${b2}
-            ${b3}
+            ${btnCtaCte}
+            ${btnFicha}
+            ${btnCierre}
             <button class="btn btn-sm btn-outline btn-icon-only" onclick="window.APP5T.openLoteHistorial('${p.id}')" title="Ver Historial del Lote" style="padding: 6px 10px; color: #60a5fa; border-color: rgba(96, 165, 250, 0.3);">
               <i class="fa-solid fa-clock-rotate-left"></i>
-            </button>
-            <button class="btn btn-sm btn-outline danger-action btn-icon-only" onclick="window.APP5T._rechazarReservaDirecta('${p.id}',event)" title="Cancelar Reserva" style="padding: 6px 10px;">
-              <i class="fa-solid fa-ban" style="color: var(--accent-red);"></i>
             </button>
           </div>
         </td>
@@ -2537,17 +2682,20 @@ const APP5T = (() => {
       const c = APP5T_DB.getById('clientes', neg.id_cliente);
       const proy = p.id_proyecto ? APP5T_DB.getById('proyectos', p.id_proyecto) : null;
       
-      let todasPagadas = true;
+      let todasPagadas = false;
       let cuotasPendientes = 0;
-      const cuotasProp = todasCtaCte.filter(q => Number(q.id_propiedad) === Number(p.id));
+      const cuotasProp = todasCtaCte.filter(q => {
+        if (Number(q.id_propiedad) !== Number(p.id)) return false;
+        const est = String(q.estado_cuota || '').trim().toLowerCase();
+        if (est.includes('anulad') || est.includes('reprogramad')) return false;
+        return Number(q.valor_cuota || 0) > 0;
+      });
       if (cuotasProp.length > 0) {
         const pendientes = cuotasProp.filter(q => {
           const pagado = Number(q.valor_pagado || 0);
           const cuota  = Number(q.valor_cuota  || 0);
-          if (cuota <= 0) return false;
           if (q.estado_cuota) {
             const est = String(q.estado_cuota).trim().toLowerCase();
-            if (est.includes('anulad') || est.includes('reprogramad')) return false;
             return est !== 'pagado' && est !== 'pagada' && est !== 'paid';
           }
           return pagado < cuota;
@@ -8688,7 +8836,10 @@ function _renderInventario() {
       }
       _renderCatalogoDocumentos();
       if (typeof APP5T_Cloud !== 'undefined') APP5T_Cloud.syncAll().catch(()=>{});
-    }
+    },
+    openCatalogoClientesModal: openCatalogoClientesModal,
+    shareProyectoCatalogo: shareProyectoCatalogo,
+    shareLoteCatalogo: shareLoteCatalogo
   };
 
   // Merge the api object with existing APP5T properties just in case

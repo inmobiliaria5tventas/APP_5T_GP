@@ -8,21 +8,19 @@
 const APP5T_Sync = (() => {
   'use strict';
 
-  // Forzar limpieza de caché y estado local corrupto ante actualizaciones de versión sin recargar la página
-  const CURRENT_VERSION = '20261007_1900_DATA_SAFE';
+  // FIX: Registro de versión sin borrado de datos. El borrado solo ocurre en DB.init() si la DB_VERSION cambia.
+  // NO se borran tablas aquí para evitar pérdida de estados de lotes (Reservada, Vendida, etc.)
+  const CURRENT_VERSION = '20261104_1005_CLEAN_QUEUE';
   try {
     const savedVersion = localStorage.getItem('app5t_script_version');
     if (savedVersion !== CURRENT_VERSION) {
-      try { localStorage.setItem('app5t_script_version', CURRENT_VERSION); } catch(err) {}
-      const tablesToClear = [
-        'vendedores', 'clientes', 'proyectos', 'etapas', 'propiedades', 
-        'directorio', 'negociaciones', 'cuenta_corriente', 'tramites', 
-        'documentos', 'mock_users', 'sync_pending'
-      ];
-      tablesToClear.forEach(t => {
-        try { localStorage.removeItem('app5t_' + t); } catch(err) {}
-      });
-      console.warn("APP5T_Sync: Nueva versión detectada (" + CURRENT_VERSION + "). Almacenamiento local limpiado de forma segura.");
+      try {
+        localStorage.removeItem('app5t_sync_pending');
+        localStorage.setItem('app5t_script_version', CURRENT_VERSION);
+      } catch(err) {}
+      // ELIMINADO: el borrado masivo de tablas que causaba pérdida de datos en el mapa y la DB.
+      // Solo se limpia la cola pendiente antigua (app5t_sync_pending) y se actualiza la clave de versión.
+      console.warn("APP5T_Sync: Nueva versión de script registrada (" + CURRENT_VERSION + "). Cola antigua limpiada y datos locales preservados.");
     }
   } catch (e) {
     console.error("APP5T_Sync: Error al verificar versión:", e);
@@ -164,8 +162,7 @@ const APP5T_Sync = (() => {
         fecha_venta:      'fecha_venta',
         url:              'url',
         estado:           'estado',
-        coordenadas:      'coordenadas',
-        ficha_abogado_generada: 'ficha_abogado_generada'
+        coordenadas:      'coordenadas'
       }
     },
     directorio: {
@@ -263,6 +260,8 @@ const APP5T_Sync = (() => {
     }
   };
 
+  const INT_FIELDS = new Set(['superficie', 'valor_final', 'abono', 'pie', 'cantidad_cuotas', 'valor_cuota', 'valor_pagado', 'nro_lotes', 'nro_etapas']);
+
   function _toSupabaseRecord(tabla, localRec) {
     if (!localRec) return null;
     const map = MAPPING[tabla];
@@ -276,6 +275,10 @@ const APP5T_Sync = (() => {
       if (val !== undefined) {
         if (typeof val === 'object' && val !== null) val = JSON.stringify(val);
         if (val === '') val = null;
+        if (val !== null && INT_FIELDS.has(localKey)) {
+          const num = Number(val);
+          if (!isNaN(num)) val = Math.round(num);
+        }
         dbRec[fieldKey] = val;
       }
     });
@@ -600,7 +603,7 @@ const APP5T_Sync = (() => {
             const json = JSON.parse(errorMsg);
             if (json && json.code) {
               const code = String(json.code);
-              if (code.startsWith('23') || code.startsWith('22') || code.startsWith('42')) {
+              if (code.startsWith('23') || code.startsWith('22') || code.startsWith('42') || code.startsWith('PGRST')) {
                 isDataError = true;
               }
             }

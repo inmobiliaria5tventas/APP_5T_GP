@@ -62,7 +62,7 @@ var APP5T_DB = (function () {
         },
         propiedades: {
             id_etapa: 'number', id_proyecto: 'number', nombre: 'string', rol: 'string',
-            superficie: 'number', coordenadas: 'object', valor_final: 'number', abono: 'number', fecha_ingreso: 'string',
+            superficie: 'number', valor_final: 'number', abono: 'number', fecha_ingreso: 'string',
             deslindes: 'string', infraestructura: 'string', fecha_reserva: 'string',
             fecha_fin_promesa: 'string',
             fecha_venta: 'string',
@@ -114,7 +114,8 @@ var APP5T_DB = (function () {
     function _validateSchema(tabla, data) {
         if (!SCHEMAS[tabla]) return data; // Skip tables without schema (e.g. auditoria)
         const schema = SCHEMAS[tabla];
-        const validData = {};
+        // FIX: Empezar con copia de TODOS los datos originales para preservar coordenadas y campos extra
+        const validData = Object.assign({}, data);
         for (let key in schema) {
             if (data[key] !== undefined) {
                 // strict cast
@@ -129,10 +130,12 @@ var APP5T_DB = (function () {
                 else if (schema[key] === 'string') validData[key] = String(data[key] || '');
                 else validData[key] = data[key];
             } else {
-                // defaults
-                if (schema[key] === 'number') validData[key] = 0;
-                else if (schema[key] === 'string') validData[key] = '';
-                else validData[key] = null;
+                // FIX: Solo setear default si el campo no existe ya en el objeto
+                if (validData[key] === undefined) {
+                    if (schema[key] === 'number') validData[key] = 0;
+                    else if (schema[key] === 'string') validData[key] = '';
+                    else validData[key] = null;
+                }
             }
         }
         return validData;
@@ -471,7 +474,12 @@ var APP5T_DB = (function () {
             hasProps = false;
         }
 
-        if (storedVersion === DB_VERSION && hasProps) {
+        if (hasProps) {
+            // Si ya hay propiedades cargadas, NO borrar la base de datos nunca.
+            // Simplemente actualizar la versión registrada y preservar datos comerciales (clientes, negociaciones, estados).
+            if (storedVersion !== DB_VERSION) {
+                try { localStorage.setItem(KEY_PREFIX + 'db_version', DB_VERSION); } catch(e){}
+            }
             // SAFE MIGRATION: Ensure existing projects have mock URLs if they are empty
             try {
                 var storedProjs = localStorage.getItem(KEY_PREFIX + 'proyectos');
@@ -498,11 +506,6 @@ var APP5T_DB = (function () {
             } catch (e) {
                 console.error('APP5T_DB: Error en migración de proyectos:', e);
             }
-            
-            // Auto-limpieza automatica de Lote 25 El Copihue
-            try {
-                limpiarLote('El Copihue', '25');
-            } catch (errClean) {}
 
             return; // ya inicializado con datos
         }
