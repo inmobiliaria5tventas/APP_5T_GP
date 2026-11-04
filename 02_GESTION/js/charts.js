@@ -181,13 +181,13 @@ const APP5T_Charts = (function () {
 
             ctx.save();
             ctx.font = 'bold 28px "Inter", "Segoe UI", sans-serif';
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = _getChartTextColor();
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(total, centerX, centerY - 10);
 
             ctx.font = 'bold 12px "Inter", "Segoe UI", sans-serif';
-            ctx.fillStyle = '#00e5ff';
+            ctx.fillStyle = _isThemeInmo() ? '#2563eb' : '#00e5ff';
             ctx.fillText('TOTAL LOTES', centerX, centerY + 14);
             ctx.restore();
         }
@@ -276,7 +276,7 @@ const APP5T_Charts = (function () {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: '#ffffff',
+                            color: _getChartTextColor(),
                             padding: window.innerWidth <= 768 ? 8 : 16,
                             usePointStyle: true,
                             pointStyleWidth: window.innerWidth <= 768 ? 8 : 12,
@@ -380,7 +380,7 @@ const APP5T_Charts = (function () {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: '#ffffff',
+                            color: _getChartTextColor(),
                             padding: 16,
                             usePointStyle: true,
                             pointStyleWidth: 12,
@@ -516,7 +516,7 @@ const APP5T_Charts = (function () {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: '#ffffff',
+                            color: _getChartTextColor(),
                             padding: 14,
                             usePointStyle: true,
                             pointStyleWidth: 10,
@@ -661,7 +661,7 @@ const APP5T_Charts = (function () {
                 const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
                 ctx.save();
                 ctx.font = 'bold 24px "Inter", sans-serif';
-                ctx.fillStyle = '#ffffff';
+                ctx.fillStyle = _getChartTextColor();
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(porcentaje + '%', centerX, centerY);
@@ -907,7 +907,7 @@ const APP5T_Charts = (function () {
                             boxWidth: 8,
                             padding: 12,
                             font: { family: "'Inter', sans-serif", size: 11, weight: '700' },
-                            color: '#ffffff'
+                            color: _getChartTextColor()
                         } 
                     },
                     tooltip: {
@@ -1070,7 +1070,7 @@ const APP5T_Charts = (function () {
                     }
                 },
                 plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12 } }
+                    legend: { position: 'bottom', labels: { boxWidth: 12, color: _getChartTextColor() } }
                 }
             }
         });
@@ -1403,7 +1403,7 @@ const APP5T_Charts = (function () {
                     legend: {
                         position: 'top',
                         labels: {
-                            color: '#ffffff',
+                            color: _getChartTextColor(),
                             boxWidth: 10,
                             font: { size: 11, weight: '600', family: '"Inter", sans-serif' }
                         }
@@ -1590,11 +1590,11 @@ const APP5T_Charts = (function () {
                     var fontSize = (height / 80).toFixed(2);
                     ctx.font = "bold " + fontSize + "em Inter";
                     ctx.textBaseline = "middle";
-                    ctx.fillStyle = "#ffffff";
+                    ctx.fillStyle = _getChartTextColor();
                     var text = "124", textX = Math.round((width - ctx.measureText(text).width) / 2), textY = height / 2 - 10;
                     ctx.fillText(text, textX, textY);
                     ctx.font = "600 " + (fontSize*0.3) + "em Inter";
-                    ctx.fillStyle = "#00e5ff";
+                    ctx.fillStyle = _isThemeInmo() ? "#2563eb" : "#00e5ff";
                     var text2 = "UNIDADES", text2X = Math.round((width - ctx.measureText(text2).width) / 2), text2Y = height / 2 + 15;
                     ctx.fillText(text2, text2X, text2Y);
                     ctx.save();
@@ -1714,6 +1714,7 @@ const APP5T_Charts = (function () {
     // ── Public: renderDashboard ────────────────────────────────────────────
     function renderDashboard(role) {
         destroy();
+        _syncChartDefaults();
         const dbFilter = document.getElementById('dashboard-filter-proyecto');
         let idProyecto = 'all';
         

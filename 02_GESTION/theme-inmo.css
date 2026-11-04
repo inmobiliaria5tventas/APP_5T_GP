@@ -655,6 +655,74 @@ body.theme-inmo {
   color: #ffffff !important;
 }
 
+/* Resumen de Inventario (Modern Clean SaaS) */
+html[data-theme="inmo"] #inventario-resumen-tabla,
+[data-theme="inmo"] #inventario-resumen-tabla {
+  border: none !important;
+  background: transparent !important;
+}
+
+html[data-theme="inmo"] #inventario-resumen-tabla > div,
+html[data-theme="inmo"] .inventario-resumen-grid,
+[data-theme="inmo"] .inventario-resumen-grid {
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+  backdrop-filter: none !important;
+}
+
+html[data-theme="inmo"] .inv-summary-card,
+html[data-theme="inmo"] #inventario-resumen-tabla > div > div,
+[data-theme="inmo"] .inv-summary-card {
+  background: #f8fafc !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+}
+
+html[data-theme="inmo"] .inv-summary-label,
+html[data-theme="inmo"] #inventario-resumen-tabla span,
+[data-theme="inmo"] .inv-summary-label {
+  color: #64748b !important;
+  font-weight: 700 !important;
+  font-size: 0.68rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+}
+
+html[data-theme="inmo"] .inv-summary-value,
+html[data-theme="inmo"] #inventario-resumen-tabla strong,
+[data-theme="inmo"] .inv-summary-value {
+  font-weight: 800 !important;
+  font-size: 1.25rem !important;
+}
+
+html[data-theme="inmo"] .inv-summary-card:first-child strong,
+html[data-theme="inmo"] #inventario-resumen-tabla > div > div:first-child strong,
+[data-theme="inmo"] .inv-summary-card:first-child strong {
+  color: #0f172a !important;
+}
+
+html[data-theme="inmo"] .inv-summary-card-total,
+html[data-theme="inmo"] #inventario-resumen-tabla > div > div:last-child,
+[data-theme="inmo"] .inv-summary-card-total {
+  background: #fffbeb !important;
+  border: 1.5px solid #fde68a !important;
+}
+
+html[data-theme="inmo"] .inv-summary-card-total span,
+html[data-theme="inmo"] #inventario-resumen-tabla > div > div:last-child span,
+[data-theme="inmo"] .inv-summary-card-total span {
+  color: #b45309 !important;
+}
+
+html[data-theme="inmo"] .inv-summary-card-total strong,
+html[data-theme="inmo"] #inventario-resumen-tabla > div > div:last-child strong,
+[data-theme="inmo"] .inv-summary-card-total strong {
+  color: #b45309 !important;
+}
+
 /* ── 15. Botón Selector de Diseño (Switch Toggle) ── */
 .theme-switch-btn {
   display: inline-flex !important;
@@ -1082,8 +1150,9 @@ body.theme-inmo .bottom-sheet {
 }
 
 /* ==========================================================================
-   18. TÍTULOS DE GRÁFICOS Y TARJETAS SIN ESPACIO EN STYLE
-   Garantiza que etiquetas y números dentro de tarjetas se lean perfectamente
+   18. TÍTULOS DE GRÁFICOS, TARJETAS Y OVERRIDE DE ESPECIFICIDAD (#panel-dashboard)
+   Garantiza que etiquetas, KPIs y textos dentro del Dashboard e Informes
+   superen la especificidad de #panel-dashboard en index.css
    ========================================================================== */
 [data-theme="inmo"] .chart-card h3,
 [data-theme="inmo"] .chart-card h4,
@@ -1103,7 +1172,284 @@ body.theme-inmo .bottom-sheet {
   color: #0f172a !important;
 }
 
+/* Override de alta especificidad (1,1,1+) contra reglas #panel-dashboard de index.css */
+html[data-theme="inmo"] #panel-dashboard,
+html[data-theme="inmo"] #panel-dashboard h1,
+html[data-theme="inmo"] #panel-dashboard h2,
+html[data-theme="inmo"] #panel-dashboard h3,
+html[data-theme="inmo"] #panel-dashboard h4,
+html[data-theme="inmo"] #panel-dashboard p,
+html[data-theme="inmo"] #panel-dashboard span,
+html[data-theme="inmo"] #panel-dashboard strong,
+html[data-theme="inmo"] #panel-dashboard label,
+html[data-theme="inmo"] #panel-dashboard th,
+html[data-theme="inmo"] #panel-dashboard td,
+html[data-theme="inmo"] #panel-dashboard .chart-title,
+html[data-theme="inmo"] #panel-dashboard .kpi-value,
+html[data-theme="inmo"] #panel-dashboard .card-title,
+html[data-theme="inmo"] #panel-dashboard .data-card h3,
+html[data-theme="inmo"] #panel-dashboard .chart-card h3,
+html[data-theme="inmo"] #panel-dashboard .dashboard-title,
+html[data-theme="inmo"] #panel-dashboard .gerencia-kpi-value,
+html[data-theme="inmo"] #panel-dashboard .table-responsive td,
+html[data-theme="inmo"] #panel-informes .card-title,
+html[data-theme="inmo"] #panel-ctacte .card-title,
+html[data-theme="inmo"] #panel-informes h3,
+html[data-theme="inmo"] #panel-ctacte h3 {
+  color: #0f172a !important;
+}
+
+html[data-theme="inmo"] #panel-dashboard .kpi-label,
+html[data-theme="inmo"] #panel-dashboard .gerencia-kpi-title,
+html[data-theme="inmo"] #panel-dashboard .gerencia-kpi-label,
+html[data-theme="inmo"] #panel-dashboard .dashboard-subtitle,
+html[data-theme="inmo"] #panel-dashboard .kpi-desc,
+html[data-theme="inmo"] #panel-dashboard .text-muted,
+html[data-theme="inmo"] #panel-dashboard .text-dim,
+html[data-theme="inmo"] #panel-dashboard .table-responsive th {
+  color: #475569 !important;
+}
+
+/* Tarjetas KPI Gerencia en Modo Inmo */
+html[data-theme="inmo"] #panel-dashboard .gerencia-kpi-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+html[data-theme="inmo"] #panel-dashboard .gerencia-kpi-footer span {
+  color: #475569 !important;
+}
+
+/* Sub-barras de métricas en Embudo y Evolución Anual */
+html[data-theme="inmo"] #panel-dashboard #embudo-metricas-sub,
+html[data-theme="inmo"] #panel-dashboard #evolucion-mini-kpis {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+html[data-theme="inmo"] #panel-dashboard #embudo-metricas-sub span,
+html[data-theme="inmo"] #panel-dashboard #evolucion-mini-kpis span {
+  color: #475569 !important;
+}
+
+html[data-theme="inmo"] #panel-dashboard #embudo-conv-promesa,
+html[data-theme="inmo"] #panel-dashboard #kpi-prom-total {
+  color: #2563eb !important;
+}
+
+html[data-theme="inmo"] #panel-dashboard #embudo-conv-escritura,
+html[data-theme="inmo"] #panel-dashboard #kpi-esc-total {
+  color: #059669 !important;
+}
+
+html[data-theme="inmo"] #panel-dashboard #embudo-lead-time,
+html[data-theme="inmo"] #panel-dashboard #kpi-monto-total {
+  color: #d97706 !important;
+}
+
+/* Preservar texto blanco en botones de exportación, KPIs vivos y botones activos del Dashboard */
+html[data-theme="inmo"] #panel-dashboard .kpi-grid .kpi-card *,
+html[data-theme="inmo"] #panel-dashboard .kpi-grid .kpi-card .kpi-label,
+html[data-theme="inmo"] #panel-dashboard .kpi-grid .kpi-card .kpi-value,
+html[data-theme="inmo"] #panel-dashboard button[style*="#27ae60"],
+html[data-theme="inmo"] #panel-dashboard button[style*="#e74c3c"],
+html[data-theme="inmo"] #panel-dashboard button.active,
+html[data-theme="inmo"] #panel-dashboard .btn-primary {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   19. BANDEJA DE APROBACIONES (ACORDEONES, TARJETAS MÓVILES, BADGES Y BOTONES)
+   Diseño Moderno Inmo 100% claro, nítido y de alto contraste
+   ========================================================================== */
+html[data-theme="inmo"] .btn-outline {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #1e293b !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+html[data-theme="inmo"] .btn-outline:hover {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+/* Acordeones de Procesos (1. Reserva, 2. Promesa, 3. Cierre Final) */
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-card {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-card.is-open {
+  border-color: #93c5fd !important;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.08) !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-header {
+  background: #f8fafc !important;
+  border-bottom: none !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-header.is-open {
+  background: linear-gradient(90deg, #eff6ff 0%, #f8fafc 100%) !important;
+  border-bottom: 1px solid #dbeafe !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-icon {
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-icon i {
+  color: #2563eb !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-title {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-badge.mesa-status-pending {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+  border: 1px solid #fcd34d !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-badge.mesa-status-ok {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border: 1px solid #86efac !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-chevron {
+  color: #475569 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-body {
+  background: #f8fafc !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones .mesa-acordeon-body .table-responsive {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Badges de Tipo y Documentos en Modo Inmo (Contraste perfecto sobre blanco) */
+html[data-theme="inmo"] #panel-aprobaciones td[data-label="Tipo"] .tag,
+html[data-theme="inmo"] #panel-aprobaciones td[data-label="Documentos"] .tag {
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones td[data-label="Tipo"] .tag[style*="52, 152, 219"],
+html[data-theme="inmo"] #panel-aprobaciones td[data-label="Documentos"] .tag[style*="59, 130, 246"] {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #93c5fd !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones td[data-label="Tipo"] .tag[style*="147, 51, 234"],
+html[data-theme="inmo"] #panel-aprobaciones td[data-label="Documentos"] .tag[style*="139, 92, 246"] {
+  background: #f3e8ff !important;
+  color: #6d28d9 !important;
+  border: 1px solid #c4b5fd !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones td[data-label="Tipo"] .tag[style*="245, 158, 11"],
+html[data-theme="inmo"] #panel-aprobaciones td[data-label="Documentos"] .tag[style*="245, 158, 11"] {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+  border: 1px solid #fcd34d !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones td[data-label="Documentos"] .tag[style*="16, 185, 129"] {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border: 1px solid #86efac !important;
+}
+
+/* Botones de Acción de Aprobaciones en Modo Inmo (100% visibles y nítidos) */
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button.btn-outline:not(.danger-action):not(:disabled) {
+  background: #eff6ff !important;
+  border: 1.5px solid #93c5fd !important;
+  color: #1d4ed8 !important;
+  font-weight: 700 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button.btn-outline:not(.danger-action):not(:disabled) i {
+  color: #1d4ed8 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button.btn-outline:disabled {
+  background: #f1f5f9 !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #64748b !important;
+  opacity: 0.85 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button.btn-outline:disabled i {
+  color: #64748b !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button[style*="#16a34a"],
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button[style*="#10b981"] {
+  background: #dcfce7 !important;
+  border: 1.5px solid #22c55e !important;
+  color: #15803d !important;
+  font-weight: 700 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button[style*="#2563eb"] {
+  background: #2563eb !important;
+  border: 1.5px solid #1d4ed8 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button[style*="#7c3aed"] {
+  background: #7c3aed !important;
+  border: 1.5px solid #6d28d9 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button[style*="#d97706"] {
+  background: #fef3c7 !important;
+  border: 1.5px solid #f59e0b !important;
+  color: #b45309 !important;
+  font-weight: 700 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button.danger-action {
+  background: #fef2f2 !important;
+  border: 1.5px solid #fca5a5 !important;
+  color: #dc2626 !important;
+}
+html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child button.danger-action i {
+  color: #dc2626 !important;
+}
+
+/* Tarjetas móviles de Mesa de Aprobaciones en Modo Inmo */
+@media (max-width: 768px) {
+  html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody tr {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-left: 5px solid #2563eb !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06) !important;
+  }
+  html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td[data-label="Lote / Proyecto"] strong {
+    color: #1d4ed8 !important;
+    font-weight: 800 !important;
+  }
+  html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td[data-label="Fecha"] {
+    color: #64748b !important;
+    font-weight: 600 !important;
+  }
+  html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td[data-label="Cliente"],
+  html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td[data-label="Cliente"] span:first-child {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+  }
+  html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td[data-label="Cliente"] span:last-child {
+    color: #64748b !important;
+  }
+  html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td[data-label="Valor"] > div:first-child {
+    color: #059669 !important;
+    font-weight: 800 !important;
+  }
+  html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td[data-label="Valor"] > div:last-child {
+    color: #475569 !important;
+    font-weight: 600 !important;
+  }
+  html[data-theme="inmo"] #panel-aprobaciones table.premium-table tbody td:last-child {
+    border-top: 1px solid #e2e8f0 !important;
+  }
+}
+
 /* Badge de tasa de efectividad (ej: "97% Conversión a Promesa") */
+html[data-theme="inmo"] #panel-dashboard #embudo-tasa-efectividad,
 [data-theme="inmo"] #embudo-tasa-efectividad {
   background: #ecfdf5 !important;
   border: 1px solid #a7f3d0 !important;
@@ -1111,11 +1457,47 @@ body.theme-inmo .bottom-sheet {
   font-weight: 700 !important;
 }
 
-/* Selectores de Años y Botones de Gráficos (Lotes / Monto $) */
-[data-theme="inmo"] .chart-card select,
-[data-theme="inmo"] .data-card select {
-  background-color: #f1f5f9 !important;
+/* Selectores de Años y Filtros con ID en Modo Inmo */
+html[data-theme="inmo"] select,
+html[data-theme="inmo"] #panel-dashboard .year-filter-select,
+html[data-theme="inmo"] .chart-card select,
+html[data-theme="inmo"] .data-card select,
+html[data-theme="inmo"] #map-project-select,
+html[data-theme="inmo"] #map-status-filter,
+html[data-theme="inmo"] #inv-filter-project,
+html[data-theme="inmo"] #inv-filter-estado,
+html[data-theme="inmo"] #filtro-catalogo-proyecto,
+html[data-theme="inmo"] #ctacte-filter-cliente,
+html[data-theme="inmo"] #ctacte-filter-lote,
+html[data-theme="inmo"] #informes-filter-mes,
+html[data-theme="inmo"] #informes-filter-anio,
+html[data-theme="inmo"] #informes-filter-proyecto,
+html[data-theme="inmo"] #rep-ctacte-proyecto,
+html[data-theme="inmo"] #rep-ventas-proyecto,
+html[data-theme="inmo"] #rep-ventas-vendedor,
+html[data-theme="inmo"] #rep-ventas-mes,
+html[data-theme="inmo"] #rep-ventas-anio,
+html[data-theme="inmo"] #rep-cuotas-proyecto,
+html[data-theme="inmo"] #rep-cuotas-estado {
+  background: #ffffff !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
   border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+html[data-theme="inmo"] #panel-dashboard .year-filter-select {
+  padding: 4px 10px !important;
+  min-height: 30px !important;
+  height: auto !important;
+}
+
+/* Tarjetas de Informes y Cuenta Corriente con selector #panel-* */
+html[data-theme="inmo"] #panel-informes .data-card,
+html[data-theme="inmo"] #panel-ctacte .data-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
   color: #0f172a !important;
 }
 

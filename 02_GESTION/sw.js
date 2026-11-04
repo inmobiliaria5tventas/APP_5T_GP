@@ -1,5 +1,5 @@
-// 5 Tierras - Service Worker (Safe Mobile WebKit Shell)
-const CACHE_NAME = '5t-gestion-v20261104_1150';
+﻿// 5 Tierras - Service Worker (Safe Mobile WebKit Shell)
+const CACHE_NAME = '5t-gestion-v20261104_1317';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -29,3 +29,8 @@ self.addEventListener('fetch', (e) => {
     fetch(e.request).catch(() => caches.match(e.request))
   );
 });
+
+
+
+
+

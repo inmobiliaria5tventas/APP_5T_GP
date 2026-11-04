@@ -1469,7 +1469,8 @@ const APP5T = (() => {
       if (btnEl) {
         const origHtml = btnEl.getAttribute('data-orig-html') || btnEl.innerHTML;
         if (!btnEl.getAttribute('data-orig-html')) btnEl.setAttribute('data-orig-html', origHtml);
-        btnEl.innerHTML = '<i class="fa-solid fa-check"></i> <span>¡Link Copiado!</span>';
+        const isIconOnly = btnEl.id === 'btn-catalogo-clientes-mobile' || !origHtml.includes('<span');
+        btnEl.innerHTML = isIconOnly ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-check"></i> <span>¡Link Copiado!</span>';
         btnEl.style.borderColor = '#22c55e';
         btnEl.style.color = '#4ade80';
         setTimeout(() => {
@@ -1516,8 +1517,8 @@ const APP5T = (() => {
     _copyTextToClipboard(link, `Link del Lote ${loteNum} (${pInfo.nombre}) copiado`, btnEl);
   }
 
-  function openCatalogoClientesModal() {
-    const btn = document.getElementById('btn-catalogo-clientes');
+  function openCatalogoClientesModal(btnOverride) {
+    const btn = btnOverride || document.getElementById('btn-catalogo-clientes');
     const select = document.getElementById('map-project-select');
     const val = select ? String(select.value || '').toLowerCase() : 'todos';
 
@@ -2033,26 +2034,27 @@ const APP5T = (() => {
       const statusColor = hasPending ? '#f59e0b' : '#10b981';
       const statusBg    = hasPending ? 'rgba(245,158,11,0.12)' : 'rgba(16,185,129,0.12)';
       const statusBdr   = hasPending ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.3)';
+      const statusClass = hasPending ? 'mesa-status-pending' : 'mesa-status-ok';
       const chevron     = isOpen ? 'rotate(90deg)' : 'rotate(0deg)';
       const cardBorder  = isOpen ? 'border: 1px solid rgba(0, 229, 255, 0.35); box-shadow: 0 4px 16px rgba(0, 229, 255, 0.08);' : 'border: 1px solid rgba(255,255,255,0.08);';
 
-      return '<div style="' + cardBorder + 'border-radius:10px;margin-bottom:8px;overflow:hidden;background:rgba(10, 26, 40, 0.75);">'
-        + '<button type="button" onclick="window.APP5T._switchMesaTab(' + num + ')"'
+      return '<div class="mesa-acordeon-card ' + (isOpen ? 'is-open' : '') + '" style="' + cardBorder + 'border-radius:10px;margin-bottom:8px;overflow:hidden;background:rgba(10, 26, 40, 0.75);">'
+        + '<button type="button" class="mesa-acordeon-header ' + (isOpen ? 'is-open' : '') + '" onclick="window.APP5T._switchMesaTab(' + num + ')"'
         + ' style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;'
         + 'background:' + (isOpen ? 'linear-gradient(90deg, rgba(0,229,255,0.12) 0%, rgba(12,38,58,0.5) 100%)' : 'rgba(255,255,255,0.02)') + ';'
         + 'border:none;cursor:pointer;text-align:left;'
         + (isOpen ? 'border-bottom:1px solid rgba(255, 255, 255, 0.08);' : '')
         + '">'
-        + '<div style="width:32px;height:32px;border-radius:6px;background:' + (isOpen ? 'rgba(0,229,255,0.15)' : 'rgba(255,255,255,0.04)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid ' + (isOpen ? 'rgba(0,229,255,0.3)' : 'rgba(255,255,255,0.08)') + ';">'
+        + '<div class="mesa-acordeon-icon" style="width:32px;height:32px;border-radius:6px;background:' + (isOpen ? 'rgba(0,229,255,0.15)' : 'rgba(255,255,255,0.04)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid ' + (isOpen ? 'rgba(0,229,255,0.3)' : 'rgba(255,255,255,0.08)') + ';">'
         + '<i class="' + icon + '" style="font-size:0.95rem;color:' + (isOpen ? 'var(--primary)' : 'var(--text-dim)') + ';"></i>'
         + '</div>'
         + '<div style="flex:1;min-width:0;">'
-        + '<div style="font-weight:700;color:var(--text-white);font-size:0.92rem;letter-spacing:0.2px;">' + title + '</div>'
+        + '<div class="mesa-acordeon-title" style="font-weight:700;color:var(--text-white);font-size:0.92rem;letter-spacing:0.2px;">' + title + '</div>'
         + '</div>'
-        + '<span style="font-size:0.72rem;font-weight:700;color:' + statusColor + ';background:' + statusBg + ';border:1px solid ' + statusBdr + ';border-radius:20px;padding:3px 10px;white-space:nowrap;flex-shrink:0;">' + statusTxt + '</span>'
-        + '<i class="fa-solid fa-chevron-right" style="color:' + (isOpen ? 'var(--primary)' : 'var(--text-dim)') + ';font-size:0.75rem;flex-shrink:0;transition:transform 0.2s;transform:' + chevron + ';margin-left:4px;"></i>'
+        + '<span class="mesa-acordeon-badge ' + statusClass + '" style="font-size:0.72rem;font-weight:700;color:' + statusColor + ';background:' + statusBg + ';border:1px solid ' + statusBdr + ';border-radius:20px;padding:3px 10px;white-space:nowrap;flex-shrink:0;">' + statusTxt + '</span>'
+        + '<i class="fa-solid fa-chevron-right mesa-acordeon-chevron" style="color:' + (isOpen ? 'var(--primary)' : 'var(--text-dim)') + ';font-size:0.75rem;flex-shrink:0;transition:transform 0.2s;transform:' + chevron + ';margin-left:4px;"></i>'
         + '</button>'
-        + '<div style="display:' + (isOpen ? 'block' : 'none') + ';padding:8px 10px 10px;background:rgba(2, 10, 16, 0.55);">'
+        + '<div class="mesa-acordeon-body" style="display:' + (isOpen ? 'block' : 'none') + ';padding:8px 10px 10px;background:rgba(2, 10, 16, 0.55);">'
         + '<div class="table-responsive" style="margin: 0; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(5, 15, 25, 0.4); max-height: calc(100vh - 270px); overflow-y: auto;">'
         + '<table class="premium-table">'
         + '<thead><tr>'
@@ -4374,28 +4376,28 @@ function _renderInventario() {
       };
 
       let summaryHtml = `
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; padding: 12px; background: rgba(10, 26, 40, 0.5); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 12px; backdrop-filter: blur(12px);">
-          <div style="flex: 1 1 100px; min-width: 90px; padding: 10px 8px; background: rgba(3, 17, 26, 0.5); border: 1px solid rgba(0, 229, 255, 0.15); border-radius: 8px; text-align: center;">
-            <span style="font-size: 0.68rem; color: var(--text-dim); display: block; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Total Lotes</span>
-            <strong style="font-size: 1.15rem; color: #ffffff; font-weight: 800; display: block; margin-top: 3px;">${props.length}</strong>
+        <div class="inventario-resumen-grid" style="display: flex; gap: 8px; flex-wrap: wrap; padding: 12px; background: rgba(10, 26, 40, 0.5); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 12px; backdrop-filter: blur(12px);">
+          <div class="inv-summary-card" style="flex: 1 1 100px; min-width: 90px; padding: 10px 8px; background: rgba(3, 17, 26, 0.5); border: 1px solid rgba(0, 229, 255, 0.15); border-radius: 8px; text-align: center;">
+            <span class="inv-summary-label" style="font-size: 0.68rem; color: var(--text-dim); display: block; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Total Lotes</span>
+            <strong class="inv-summary-value" style="font-size: 1.15rem; color: #ffffff; font-weight: 800; display: block; margin-top: 3px;">${props.length}</strong>
           </div>
       `;
       
       Object.keys(colorMap).forEach(st => {
         if (counts[st]) {
           summaryHtml += `
-            <div style="flex: 1 1 100px; min-width: 90px; padding: 10px 8px; background: rgba(3, 17, 26, 0.5); border: 1px solid rgba(0, 229, 255, 0.15); border-radius: 8px; text-align: center;">
-              <span style="font-size: 0.68rem; color: var(--text-dim); display: block; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">${st.replace('_', ' ')}</span>
-              <strong style="font-size: 1.15rem; color: ${colorMap[st]}; font-weight: 800; display: block; margin-top: 3px;">${counts[st]}</strong>
+            <div class="inv-summary-card" style="flex: 1 1 100px; min-width: 90px; padding: 10px 8px; background: rgba(3, 17, 26, 0.5); border: 1px solid rgba(0, 229, 255, 0.15); border-radius: 8px; text-align: center;">
+              <span class="inv-summary-label" style="font-size: 0.68rem; color: var(--text-dim); display: block; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">${st.replace('_', ' ')}</span>
+              <strong class="inv-summary-value" style="font-size: 1.15rem; color: ${colorMap[st]}; font-weight: 800; display: block; margin-top: 3px;">${counts[st]}</strong>
             </div>
           `;
         }
       });
       
       summaryHtml += `
-          <div style="flex: 2 1 180px; min-width: 140px; padding: 10px 12px; background: rgba(243, 156, 18, 0.08); border: 1px solid rgba(243, 156, 18, 0.25); border-radius: 8px; text-align: center;">
-            <span style="font-size: 0.68rem; color: var(--accent-orange); display: block; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Valor Inventario</span>
-            <strong style="font-size: 1.15rem; color: var(--accent-orange); font-weight: 800; display: block; margin-top: 3px;">${APP5T_Utils.formatMoneda(valTotal)}</strong>
+          <div class="inv-summary-card inv-summary-card-total" style="flex: 2 1 180px; min-width: 140px; padding: 10px 12px; background: rgba(243, 156, 18, 0.08); border: 1px solid rgba(243, 156, 18, 0.25); border-radius: 8px; text-align: center;">
+            <span class="inv-summary-label" style="font-size: 0.68rem; color: var(--accent-orange); display: block; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Valor Inventario</span>
+            <strong class="inv-summary-value" style="font-size: 1.15rem; color: var(--accent-orange); font-weight: 800; display: block; margin-top: 3px;">${APP5T_Utils.formatMoneda(valTotal)}</strong>
           </div>
         </div>
       `;
@@ -7177,10 +7179,14 @@ function _renderInventario() {
     // 3. Force Sync button handler
     const forceSyncBtn = document.getElementById('btn-force-sync');
     if (forceSyncBtn) {
-      forceSyncBtn.addEventListener('click', () => {
-        if (confirm('¿Desea forzar una sincronización completa? Se limpiará la memoria local y se descargarán los datos reales de internet.')) {
-          localStorage.removeItem('app5t_db_version');
+      forceSyncBtn.addEventListener('click', async () => {
+        if (confirm('¿Desea sincronizar con la nube? Se descargarán los datos oficiales actualizados desde Supabase.')) {
           localStorage.removeItem('app5t_sync_pending');
+          if (typeof APP5T_Sync !== 'undefined' && typeof APP5T_Sync.pullAll === 'function') {
+            try {
+              await APP5T_Sync.pullAll(false);
+            } catch (e) {}
+          }
           window.location.reload();
         }
       });

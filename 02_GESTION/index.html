@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
   <!--  —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   —   — 
@@ -57,9 +57,9 @@
 
 
   <!-- App Design System -->
-  <link rel="stylesheet" href="index.css?v=theme_1790290881836">
+  <link rel="stylesheet" href="index.css?v=20261104_1317">
   <!-- Diseño Alternativo InmoCMS Modern Clean SaaS -->
-  <link rel="stylesheet" href="theme-inmo.css?v=1.0.0">
+  <link rel="stylesheet" href="theme-inmo.css?v=20261104_1317">
   <!-- Tailwind CSS CDN for Login and Settings Panel -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -235,6 +235,11 @@
             <!-- Funnel Button (Only visible on map mobile) -->
             <button id="map-filter-toggle" class="map-filter-toggle-btn" onclick="document.getElementById('map-controls-panel').classList.toggle('expanded')" title="Filtros del Mapa" style="background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;">
               <i class="fa-solid fa-filter"></i>
+            </button>
+
+            <!-- Botón Catálogo Clientes (Móvil: solo icono de compartir) -->
+            <button id="btn-catalogo-clientes-mobile" class="catalogo-clientes-mobile-btn" type="button" onclick="window.APP5T && window.APP5T.openCatalogoClientesModal(this)" title="Copiar Link Catálogo Clientes" aria-label="Copiar Link Catálogo Clientes">
+              <i class="fa-solid fa-share-nodes"></i>
             </button>
 
             <!-- Selector de Diseño Alternativo: Clásico vs InmoCMS -->
@@ -480,7 +485,7 @@
                 <button type="button" id="btn-toggle-3d" onclick="window.APP5T_Map3D && window.APP5T_Map3D.toggle3D()" class="btn-3d-toggle" style="display: inline-flex; padding: 0 12px; height: 38px; align-items: center; justify-content: center; gap: 6px; border: 1px solid #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.08); font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); font-size: 0.82rem; box-shadow: 0 2px 8px rgba(0,229,255,0.2);" title="Alternar Vista 3D con Relieve (Modo PC)">
                   <i class="fa-solid fa-cube"></i> <span id="lbl-toggle-3d">Vista 3D</span>
                 </button>
-                <button type="button" id="btn-catalogo-clientes" onclick="window.APP5T && window.APP5T.openCatalogoClientesModal()" class="btn btn-outline" style="display: inline-flex; padding: 0 12px; height: 38px; align-items: center; justify-content: center; gap: 6px; border: 1px solid #a855f7; color: #c084fc; background: rgba(168, 85, 247, 0.12); font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); font-size: 0.82rem; box-shadow: 0 2px 8px rgba(168,85,247,0.22);" title="Abrir y Compartir Catálogo Georreferenciado para Clientes">
+                <button type="button" id="btn-catalogo-clientes" onclick="window.APP5T && window.APP5T.openCatalogoClientesModal(this)" class="btn btn-outline" style="display: inline-flex; padding: 0 12px; height: 38px; align-items: center; justify-content: center; gap: 6px; border: 1px solid #a855f7; color: #c084fc; background: rgba(168, 85, 247, 0.12); font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); font-size: 0.82rem; box-shadow: 0 2px 8px rgba(168,85,247,0.22);" title="Copiar Link Catálogo Georreferenciado para Clientes">
                   <i class="fa-solid fa-share-nodes"></i> <span>Catálogo Clientes</span>
                 </button>
               </div>
@@ -1390,16 +1395,16 @@
   </script>
 
   <!-- App Modules -->
-  <script src="js/utils.js?v=20261104_1150"></script>
-  <script src="js/db.js?v=20261104_1150"></script>
-  <script src="js/sync.js?v=20261104_1150"></script>
-  <script src="js/map_3d.js?v=20261104_1150"></script>
-  <script src="js/map.js?v=20261104_1150"></script>
-  <script src="js/charts.js?v=20261104_1150"></script>
-  <script src="js/forms.js?v=20261104_1150"></script>
-  <script src="js/excel_reports.js?v=20261104_1150"></script>
-  <script src="js/drive_catalog.js?v=20261104_1150"></script>
-  <script src="js/app.js?v=20261104_1150"></script>
+  <script src="js/utils.js?v=20261104_1317"></script>
+  <script src="js/db.js?v=20261104_1317"></script>
+  <script src="js/sync.js?v=20261104_1317"></script>
+  <script src="js/map_3d.js?v=20261104_1317"></script>
+  <script src="js/map.js?v=20261104_1317"></script>
+  <script src="js/charts.js?v=20261104_1317"></script>
+  <script src="js/forms.js?v=20261104_1317"></script>
+  <script src="js/excel_reports.js?v=20261104_1317"></script>
+  <script src="js/drive_catalog.js?v=20261104_1317"></script>
+  <script src="js/app.js?v=20261104_1317"></script>
   <!-- ================================================================
        MODAL: NOTIFICATIONS (Solicitudes Pendientes)
        ================================================================ -->
@@ -1549,6 +1554,11 @@
   </script>
 </body>
 </html>
+
+
+
+
+
 
 
 

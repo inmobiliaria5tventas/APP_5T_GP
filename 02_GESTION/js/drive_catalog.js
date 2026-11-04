@@ -255,23 +255,34 @@
     },
 
     populateDatabaseUrls: function() {
-      if (typeof APP5T_DB === 'undefined' || !APP5T_DB.getAll) return 0;
-      const props = APP5T_DB.getAll('propiedades') || [];
-      let updatedCount = 0;
-      props.forEach(p => {
-        const directUrl = window.APP5T_DRIVE_CATALOG.getFolderForLote(p.id_proyecto, p.nombre || p.id);
-        if (!p.url || p.url.trim() === '' || p.url.includes('drive.google.com/drive/folders/1J2qkvpVKQcLD9pmryPXDC525tTnUIN8I') || p.url.includes('/search?q=')) {
-          if (directUrl && directUrl !== p.url) {
-            p.url = directUrl;
-            APP5T_DB.update('propiedades', p.id, { url: directUrl });
-            updatedCount++;
+      // IMPORTANTE: Actualizar URLs de Drive SOLO en memoria local (localStorage)
+      // NUNCA llamar a APP5T_DB.update() en un bucle de inicio, ya que eso dispara
+      // 232 peticiones PATCH a Supabase antes de descargar los estados reales (pullAll),
+      // sobreescribiendo los lotes remotos con el estado por defecto 'Disponible'.
+      try {
+        const raw = localStorage.getItem('app5t_propiedades');
+        if (!raw) return 0;
+        const props = JSON.parse(raw);
+        if (!Array.isArray(props)) return 0;
+        let updatedCount = 0;
+        props.forEach(p => {
+          if (!p) return;
+          const directUrl = window.APP5T_DRIVE_CATALOG.getFolderForLote(p.id_proyecto, p.nombre || p.id);
+          if (!p.url || p.url.trim() === '' || p.url.includes('drive.google.com/drive/folders/1J2qkvpVKQcLD9pmryPXDC525tTnUIN8I') || p.url.includes('/search?q=')) {
+            if (directUrl && directUrl !== p.url) {
+              p.url = directUrl;
+              updatedCount++;
+            }
           }
+        });
+        if (updatedCount > 0) {
+          localStorage.setItem('app5t_propiedades', JSON.stringify(props));
+          console.log('APP5T_DRIVE_CATALOG: Se vincularon localmente ' + updatedCount + ' lotes con sus carpetas directas de Drive (sin sobreescribir Supabase).');
         }
-      });
-      if (updatedCount > 0) {
-        console.log('APP5T_DRIVE_CATALOG: Se vincularon automáticamente ' + updatedCount + ' lotes con sus carpetas directas de Drive.');
+        return updatedCount;
+      } catch (e) {
+        return 0;
       }
-      return updatedCount;
     }
   };
 })();

@@ -10,7 +10,7 @@ const APP5T_Sync = (() => {
 
   // FIX: Registro de versión sin borrado de datos. El borrado solo ocurre en DB.init() si la DB_VERSION cambia.
   // NO se borran tablas aquí para evitar pérdida de estados de lotes (Reservada, Vendida, etc.)
-  const CURRENT_VERSION = '20261104_1005_CLEAN_QUEUE';
+  const CURRENT_VERSION = '20261104_1220_SAFE_SYNC';
   try {
     const savedVersion = localStorage.getItem('app5t_script_version');
     if (savedVersion !== CURRENT_VERSION) {
@@ -663,18 +663,18 @@ const APP5T_Sync = (() => {
         updateIndicator('online');
         console.log('APP5T_Sync: Supabase connected successfully.');
 
+        // 1. Descargar SIEMPRE primero el estado oficial desde Supabase al iniciar
+        // (garantiza que un navegador limpio o servidor nuevo obtenga los 232 lotes reales de inmediato)
+        try {
+          await pullAll(true);
+        } catch (pullErr) {
+          console.warn('APP5T_Sync: Initial pullAll warning:', pullErr.message || pullErr);
+        }
 
-        // AUTO-MIGRATION RESET eliminado en v1.7.9
-        // Era el verdadero causante del borrado masivo de datos:
-        // reseteaba todas las propiedades a 'Disponible' en cualquier
-        // navegador/dispositivo nuevo donde no existiera la clave localStorage.
-
-
-
-        // Replay any pending operations
+        // 2. Replay any pending operations
         await _replayPending();
 
-        // Start periodic sync
+        // 3. Start periodic sync
         _startInterval();
       } else {
         updateIndicator('offline');
@@ -800,6 +800,22 @@ const APP5T_Sync = (() => {
     return _enqueue(async () => {
       const path = tabla.toLowerCase();
       const mappedData = _toSupabaseRecord(tabla, data);
+
+      // Escudo anti-sobreescritura: si una actualización de 'propiedades' trae estado='Disponible'
+      // pero existe una negociación activa en localStorage para ese lote, preservar el estado comercial real.
+      if (tabla === 'propiedades' && action === 'update' && mappedData && mappedData.estado === 'Disponible') {
+        try {
+          const rawNegs = localStorage.getItem('app5t_negociaciones');
+          const negs = rawNegs ? JSON.parse(rawNegs) : [];
+          const activeNeg = Array.isArray(negs) ? negs.find(n =>
+            n && String(n.id_propiedad) === String(mappedData.id) &&
+            n.is_active !== false && String(n.estado_avance || '').toLowerCase() !== 'cancelado'
+          ) : null;
+          if (activeNeg) {
+            delete mappedData.estado;
+          }
+        } catch (e) {}
+      }
 
       if (!isConfigured()) {
         _addPending(tabla, action, data);
@@ -1842,9 +1858,40 @@ const APP5T_Sync = (() => {
           }
         }
 
-        // â”€â”€ Merge local/pending/in-flight changes BEFORE running self-healing checks â”€â”€
+        // ── Merge local/pending/in-flight changes BEFORE running self-healing checks ──
         const mergedNegs = _getMergedLocalRecords('negociaciones', remoteNegs);
         const mergedProps = _getMergedLocalRecords('propiedades', remoteProps);
+
+        // ── Escudo de auto-sanación: si un lote tiene una negociación activa, NUNCA puede quedar en 'Disponible' ──
+        const activeNegByProp = {};
+        mergedNegs.forEach(n => {
+          if (!n || !n.id_propiedad) return;
+          if (n.is_active === false || String(n.estado_avance || '').toLowerCase() === 'cancelado') return;
+          activeNegByProp[String(n.id_propiedad)] = n;
+        });
+        mergedProps.forEach(p => {
+          if (!p) return;
+          if (typeof window.APP5T_DRIVE_CATALOG !== 'undefined' && (!p.url || !p.url.trim())) {
+            const dUrl = window.APP5T_DRIVE_CATALOG.getFolderForLote(p.id_proyecto, p.nombre || p.id);
+            if (dUrl) p.url = dUrl;
+          }
+          const activeNeg = activeNegByProp[String(p.id)];
+          if (activeNeg && (!p.estado || p.estado === 'Disponible')) {
+            const proc = String(activeNeg.id_proceso || activeNeg.tipo_operacion || '').toLowerCase();
+            const av = String(activeNeg.estado_avance || '').toLowerCase();
+            if (proc === 'venta' || av === 'finalizado') {
+              p.estado = 'Vendida';
+            } else if (proc === 'promesa' || av === 'promesada') {
+              p.estado = 'Promesada';
+            } else if (proc === 'venta_directa' && av === 'aprobado') {
+              p.estado = 'Venta_Directa';
+            } else if (av === 'aprobado') {
+              p.estado = 'Reservada';
+            } else if (av === 'en curso') {
+              p.estado = 'Pendiente';
+            }
+          }
+        });
 
         let hasChanges = false;
         const tables = ['vendedores', 'clientes', 'proyectos', 'etapas', 'propiedades', 'directorio', 'negociaciones', 'cuenta_corriente', 'tramites', 'auditoria']; // 'documentos' excluida: tabla no existe en Supabase
